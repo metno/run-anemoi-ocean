@@ -1,0 +1,10 @@
+output: tmp_dir/output.out
+error: tmp_dir/error.err
+nodes: 1
+ntasks-per-node: 4
+gpus-per-node: 4
+mem: 450G
+account: DestE_330_24
+partition: boost_usr_prod
+job-name: test
+exclusive: None
