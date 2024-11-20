@@ -1,5 +1,8 @@
-from autorun_anemoi import AutoRunAnemoi
 import argparse
+
+from autorun_anemoi import AutoRunAnemoi
+from autorun_anemoi.utils import string_to_nested_dict
+
 
 def get_parser():
     parser = argparse.ArgumentParser(description="Automatized execution of AnemoI runs")
@@ -11,28 +14,8 @@ def get_parser():
     parser.add_argument('--tmp_dir', type=str, default='tmp_dir', help='Path to temporary dir containing modified config, jobscripts etc..')
     parser.add_argument('--python_script', type=str, default='train.py', help='Python script to be executed')
     parser.add_argument('--inference_python_script', type=str, default='inference.py', help='Inference Python script to be executed')
+    parser.add_argument('--system', type=str, default='leonardo', help='Where to run anemoi training')
     return parser
-
-def string_to_nested_dict(s):
-    # Split the string into key path and value
-    key_path, value = s.split('=')
-    # Convert the value to appropriate type
-    try:
-        value = int(value)
-    except ValueError:
-        value = value.strip()
-
-    # Split the key path into keys
-    keys = key_path.split('.')
-
-    # Create the nested dictionary
-    nested_dict = current_level = {}
-    for key in keys[:-1]:
-        current_level[key] = {}
-        current_level = current_level[key]
-    current_level[keys[-1]] = value
-
-    return nested_dict
 
 
 def run():
@@ -47,9 +30,12 @@ def run():
                         args.config,
                         args.job_yaml,
                         max_time_per_job=args.max_time_per_job,
-                        inference_yaml=args.inference_config)
+                        inference_config=args.inference_config,
+                        system=args.system,
+    )
 
-    obj.modify_dict(**unknown_dct)
+    obj.modify_config(**unknown_dct)
     obj(tmp_dir=args.tmp_dir,
         python_script=args.python_script,
-        inference_python_script=args.inference_python_script)
+        inference_python_script=args.inference_python_script,
+    )

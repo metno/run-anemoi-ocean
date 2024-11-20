@@ -31,6 +31,7 @@ do
     autorun 20:00:00 aifs/config/config.yaml job.yaml --model.num_channels=$NCHANNELS
 done
 ```
+Or using the `modify_config`-method in Python.
 
 ## Run inference
 Inference can be submitted as a dependency job, running when the last production job is finished. The inference config needs to be provided in order to invoke this operation:
