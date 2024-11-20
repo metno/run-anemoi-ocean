@@ -11,7 +11,7 @@ setup(name='auto-run-anemoi',
       long_description_content_type="text/markdown",
       url='http://github.com/metno/run-anemoi',
       author='Bris team',
-      author_email='avnor2743@met.no',
+      author_email='evnor2743@met.no',
       license='GNU GPL v3.0',
       packages=setuptools.find_packages(),
       test_suite='nose.collector',
@@ -22,5 +22,6 @@ setup(name='auto-run-anemoi',
             'autorun=autorun_anemoi.cmd_interface:run'
         ]
       },
+      package_data={'autorun_anemoi': ['system_specific_cmds/*.sh', 'random_words/random_words_v1.yaml']},
       zip_safe=False)
 

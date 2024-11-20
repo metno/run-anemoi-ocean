@@ -1,3 +1,4 @@
+import importlib
 from pathlib import Path
 
 from autorun_anemoi.utils import *
@@ -117,13 +118,31 @@ class AutoRunAnemoi:
         config_name = path / config_name
         inference_jobscript_name = path / inference_jobscript_name
         inference_config_name = path / inference_config_name
+        autorun_path = __file__[:__file__.rfind('/')]
+
+        # ensure that run_id is set, we need the name for dependency jobs
+        run_id = self.base_dict['training']['run_id']
+        if run_id is None:
+            run_id = get_random_name(autorun_path +'/random_words/random_words_v1.yaml')
+            #run_id = get_random_name('system_specific_cmds/lumi.sh')
+            self.base_dict['training']['run_id'] = run_id
+            print(f"run_id not defined, forced run-ID '{run_id}'")
 
         # build config and jobscript, and submit job
         self._build_config(self.base_dict, config_name)
-        env_var = file2str(f'system_specific_cmds/{self.system}.sh')
+        env_var = file2str(autorun_path + f'/system_specific_cmds/{self.system}.sh')
         env_var_tmp = env_var.format(python_script, config_name)
         build_jobscript(jobscript_name, self.job_dict, env_var_tmp.split('\n'))
         job_id = submit_jobscript(jobscript_name)
+
+        # setting fork_run_id to run_id and rebuild config and jobscript
+        self.base_dict['training']['fork_run_id'] = run_id
+        self.base_dict['training']['load_weights_only'] = False
+        config_name = extend_filename(config_name, 'dependency')
+        self._build_config(self.base_dict, config_name)
+        env_var_tmp = env_var.format(python_script, config_name)
+        jobscript_name = extend_filename(jobscript_name, 'dependency')
+        build_jobscript(jobscript_name, self.job_dict, env_var_tmp.split('\n'))
 
         # dependency jobs
         for i in range(1, self.nrun):

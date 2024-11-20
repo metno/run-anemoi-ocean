@@ -1,3 +1,4 @@
+import random
 import re
 import subprocess
 
@@ -117,3 +118,11 @@ def string_to_nested_dict(s):
         current_level = current_level[key]
     current_level[keys[-1]] = value
     return nested_dict
+
+def get_random_name(filename):
+    """Get random combination of noun and adjective taken from
+    yaml file."""
+    yaml = read_yaml(filename)
+    adjective = random.choice(yaml['adjectives'])
+    noun = random.choice(yaml['nouns'])
+    return f'{adjective}_{noun}'
