@@ -14,6 +14,7 @@ def get_parser():
     parser.add_argument('--tmp_dir', type=str, default='tmp_dir', help='Path to temporary dir containing modified config, jobscripts etc..')
     parser.add_argument('--python_script', type=str, default='train.py', help='Python script to be executed')
     parser.add_argument('--inference_python_script', type=str, default='inference.py', help='Inference Python script to be executed')
+    parser.add_argument('--inference_job_yaml', type=str, default=None, help='Path to inference yaml file containing sbatch commands')
     parser.add_argument('--system', type=str, default='leonardo', help='Where to run anemoi training')
     return parser
 
@@ -38,4 +39,5 @@ def run():
     obj(tmp_dir=args.tmp_dir,
         python_script=args.python_script,
         inference_python_script=args.inference_python_script,
+        inference_job_yaml=args.inference_job_yaml,
     )

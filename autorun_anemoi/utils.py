@@ -126,3 +126,17 @@ def get_random_name(filename):
     adjective = random.choice(yaml['adjectives'])
     noun = random.choice(yaml['nouns'])
     return f'{adjective}_{noun}'
+
+def merge(a: dict, b: dict, path=[]):
+    """Merge two dictionaries recursively."""
+    for key in b:
+        if key in a:
+            if isinstance(a[key], dict) and isinstance(b[key], dict):
+                merge(a[key], b[key], path + [str(key)])
+            elif a[key] != b[key]:
+                a[key] = b[key]
+                #print('inside merge:', a[key], b[key])
+                #raise Exception('Conflict at ' + '.'.join(path + [str(key)]))
+        else:
+            a[key] = b[key]
+    return a

@@ -70,7 +70,7 @@ class AutoRunAnemoi:
 
     def modify_config(self, **kwargs) -> dict:
         """Command line arguments are used to overwrite config."""
-        self.base_dict = self.base_dict | kwargs
+        self.base_dict = merge(self.base_dict, kwargs)
         return self.base_dict
 
     def _calc_time_per_run(self, total_time, max_time_per_run) -> None:
@@ -109,6 +109,7 @@ class AutoRunAnemoi:
                  inference_jobscript_name='inference.sh',
                  inference_config_name='inference.yaml',
                  inference_python_script='inference.py',
+                 inference_job_yaml=None,
         ) -> None:
         """Run automatized framework. Generates a bunch of temporary files."""
         # set up correct paths
@@ -160,10 +161,13 @@ class AutoRunAnemoi:
             self.inference_dict['experiment']['epoch'] = f'epoch_{max_epochs-1:0>3}'
             dump_yaml(self.inference_dict, inference_config_name)
             env_var_tmp = env_var.format(inference_python_script, inference_config_name)
-            job_dict_tmp = self.job_dict
-            job_dict_tmp['job-name'] += '_infer'
-            job_dict_tmp['output'] = extend_filename(self.job_dict['output'], 'infer')
-            job_dict_tmp['error'] = extend_filename(self.job_dict['error'], 'infer')
+            if inference_job_yaml is None:
+                job_dict_tmp = self.job_dict
+                job_dict_tmp['job-name'] += '_infer'
+                job_dict_tmp['output'] = extend_filename(self.job_dict['output'], 'infer')
+                job_dict_tmp['error'] = extend_filename(self.job_dict['error'], 'infer')
+            else:
+                job_dict_tmp = read_yaml(inference_job_yaml)
             build_jobscript(inference_jobscript_name, job_dict_tmp, env_var_tmp.split('\n'))
             job_id = submit_jobscript(inference_jobscript_name, dependency=f'afterany:{job_id}')
 
