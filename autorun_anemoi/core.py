@@ -155,6 +155,9 @@ class AutoRunAnemoi:
 
         # run inference if inference config is given
         if self.run_inference:
+            max_epochs = self.base_dict['training']['max_epochs']
+            self.inference_dict['experiment']['label'] = run_id
+            self.inference_dict['experiment']['epoch'] = f'epoch_{max_epochs-1:0>3}'
             dump_yaml(self.inference_dict, inference_config_name)
             env_var_tmp = env_var.format(inference_python_script, inference_config_name)
             job_dict_tmp = self.job_dict
