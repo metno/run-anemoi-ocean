@@ -1,5 +1,5 @@
-output: tmp_dir/output.out
-error: tmp_dir/error.err
+output: output.out
+error: error.err
 nodes: 1
 ntasks-per-node: 4
 gpus-per-node: 4

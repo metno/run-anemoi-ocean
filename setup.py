@@ -19,7 +19,7 @@ setup(name='auto-run-anemoi',
       install_requires=['ruamel.yaml'],
       entry_points={
         'console_scripts': [
-            'autorun=autorun_anemoi.cmd_interface:run'
+            'run-anemoi=autorun_anemoi.cmd_interface:run'
         ]
       },
       package_data={'autorun_anemoi': ['system_specific_cmds/*.sh', 'random_words/random_words_v1.yaml']},
