@@ -13,23 +13,23 @@ class AutoRunAnemoi:
     """
     def __init__(
             self, 
-            total_time,
             base_yaml,
             job_yaml,
+            total_time=None,
             max_time_per_job=None,
             inference_config=None,
             system='leonardo',
         ) -> None:
         """
         Args:
-            total_time: str
-                Total run time given in D-HH:MM:SS format.
-                Split into several jobs if exceeds max_time_per_job, which
-                is the max run time of partition by default.
             base_yaml: str
                 This is the main config, which might be modified
             job_yaml: str
                 YAML file with SBATCH arguments to be used in job script.
+            total_time: str
+                Total run time given in D-HH:MM:SS format.
+                Split into several jobs if exceeds max_time_per_job, which
+                is the max run time of partition by default.
             max_time_per_job: str
                 Maximum time per job, determines how many separate runs we get.
                 Maximum allowed time by default.
@@ -75,15 +75,20 @@ class AutoRunAnemoi:
 
     def _calc_time_per_run(self, total_time, max_time_per_run) -> None:
         """Calculate execution time per run and the number of runs."""
-        total_time_sec = time_str_to_sec(total_time)
         if self.system == 'leonardo':
             max_time = '1-00:00:00'
         elif self.system == 'lumi':
             max_time = '2-00:00:00'
         else:
             raise NotImplemented
+        if total_time is None:
+            try:
+                total_time = self.job_dict['time']
+            except KeyError:
+                raise KeyError("Total time has to be specified in job config or throught the 'total_time' argument")
         if max_time_per_run is None:
             max_time_per_run = max_time
+        total_time_sec = time_str_to_sec(total_time)
         max_time_per_run_sec = time_str_to_sec(max_time_per_run)
         max_time_sec = time_str_to_sec(max_time)
         if max_time_per_run_sec > max_time_sec:
