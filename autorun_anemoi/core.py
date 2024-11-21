@@ -105,15 +105,15 @@ class AutoRunAnemoi:
             dct['hydra'] = {'searchpath': ['pkg://' + path]}
         dump_yaml(self.base_dict, filename)
 
-    def __call__(self,
-                 tmp_dir='tmp_dir',
-                 jobscript_name='jobscript.sh',
-                 config_name='config.yaml',
-                 python_script='train.py',
-                 inference_jobscript_name='inference.sh',
-                 inference_config_name='inference.yaml',
-                 inference_python_script='inference.py',
-                 inference_job_yaml=None,
+    def run(self,
+            tmp_dir='tmp_dir',
+            jobscript_name='jobscript.sh',
+            config_name='config.yaml',
+            python_script='train.py',
+            inference_jobscript_name='inference.sh',
+            inference_config_name='inference.yaml',
+            inference_python_script='inference.py',
+            inference_job_yaml=None,
         ) -> None:
         """Run automatized framework. Generates a bunch of temporary files."""
         # set up correct paths
@@ -174,3 +174,6 @@ class AutoRunAnemoi:
                 job_dict_tmp = read_yaml(inference_job_yaml)
             build_jobscript(inference_jobscript_name, job_dict_tmp, env_var_tmp.split('\n'))
             submit_jobscript(inference_jobscript_name, dependency=f'afterany:{job_id}')
+
+    def __call__(self, **kwargs):
+        return self.run(**kwargs)

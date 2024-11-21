@@ -36,8 +36,8 @@ def run():
     )
 
     obj.modify_config(**unknown_dct)
-    obj(tmp_dir=args.tmp_dir,
-        python_script=args.python_script,
-        inference_python_script=args.inference_python_script,
-        inference_job_yaml=args.inference_job_yaml,
+    obj.run(tmp_dir=args.tmp_dir,
+            python_script=args.python_script,
+            inference_python_script=args.inference_python_script,
+            inference_job_yaml=args.inference_job_yaml,
     )

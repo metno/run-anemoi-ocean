@@ -47,7 +47,7 @@ The same operation can be done by creating an `AutoRunAnemoi`-object in Python:
 from autorun_anemoi import AutoRunAnemoi
 
 obj = AutoRunAnemoi('aifs/config/config.yaml', 'job.yaml')
-obj()
+obj.run()
 ```
 
 ## Chained jobs
@@ -94,7 +94,7 @@ from autorun_anemoi import AutoRunAnemoi
 obj = AutoRunAnemoi('aifs/config/config.yaml', 'job.yaml')
 for i in [256, 512]:
 	obj.modify_config(f'model.num_channels={i}')
-	obj()
+	obj.run()
 ```
 
 ## Help
