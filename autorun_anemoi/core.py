@@ -1,4 +1,3 @@
-import importlib
 from pathlib import Path
 
 from autorun_anemoi.utils import *
@@ -174,13 +173,4 @@ class AutoRunAnemoi:
             else:
                 job_dict_tmp = read_yaml(inference_job_yaml)
             build_jobscript(inference_jobscript_name, job_dict_tmp, env_var_tmp.split('\n'))
-            job_id = submit_jobscript(inference_jobscript_name, dependency=f'afterany:{job_id}')
-
-
-if __name__ == "__main__":
-    obj = AutoRunAnemoi('2:30:00', 'aifs/config/stage_a.yaml', 'job.yaml', max_time_per_job='01:00:00', inference_config='aifs/config/inference.yaml')
-    obj.modify_config(num_channels=512)
-    obj(tmp_dir='tmp_dir',
-        python_script='train.py',
-        inference_python_script='inference.py',
-    )
+            submit_jobscript(inference_jobscript_name, dependency=f'afterany:{job_id}')
