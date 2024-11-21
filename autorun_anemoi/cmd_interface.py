@@ -1,7 +1,7 @@
 import argparse
 
 from autorun_anemoi import AutoRunAnemoi
-from autorun_anemoi.utils import string_to_nested_dict
+from autorun_anemoi.utils import merge, string_to_nested_dict
 
 
 def get_parser():
@@ -25,7 +25,7 @@ def run():
     unknown_dct = {}
     for element in unknown:
         dct = string_to_nested_dict(element)
-        unknown_dct = unknown_dct | dct
+        unknown_dct = merge(unknown_dct, dct)
 
     obj = AutoRunAnemoi(args.config,
                         args.job_yaml,
