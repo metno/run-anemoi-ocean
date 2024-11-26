@@ -8,7 +8,6 @@
 #
 #   srun singularity exec -B ... run-pytorch.py
 
-echo "running run_pytorch.sh"
 # Printing GPU information to terminal once
 if [ $SLURM_LOCALID -eq 0 ] ; then
     rocm-smi
@@ -77,5 +76,4 @@ export AIFS_BASE_SEED=1337420
 export PYTHONUSERBASE=$VIRTUAL_ENV
 export PATH=$PATH:$VIRTUAL_ENV/bin
 
-echo "running anemoi training"
-anemoi-training train --config-dir=/pfs/lustrep4/scratch/project_465001383/haugenha/run-anemoi-setup/run-anemoi/lumi --config-name=test_config.yaml
+anemoi-training train --config-dir=$1 --config-name=$2
