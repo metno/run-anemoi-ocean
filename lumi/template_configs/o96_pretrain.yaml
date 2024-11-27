@@ -95,7 +95,7 @@ hardware:
     output: #Change this
     graph: /pfs/lustrep4/scratch/project_465001383/aifs/graphs/
   files:
-    dataset: aifs-od-an-oper-0001-mars-o96-2016-2023-6h-v6.zarr
+    dataset: aifs-ea-an-oper-0001-mars-o96-1979-2022-6h-v6.zarr
     graph: o96_5p_12knn.pt
   num_gpus_per_model: 1
 
