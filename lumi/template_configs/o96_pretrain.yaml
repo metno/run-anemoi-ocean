@@ -87,7 +87,7 @@ diagnostics:
       authentication: True
       tracking_uri: https://mlflow.ecmwf.int
       experiment_name: 'metno'
-      run_name: ref_o96_pretrain
+      run_name: null #Change this
  
 hardware:
   paths:
