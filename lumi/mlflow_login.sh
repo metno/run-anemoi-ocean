@@ -1,0 +1,2 @@
+CONTAINER=/pfs/lustrep4/scratch/project_465001383/aifs/container/containers/anemoi-training-pytorch-2.2.2-rocm-5.6.1-py-3.11.5.sif
+singularity exec -B /pfs:/pfs $CONTAINER bash /pfs/lustrep4/$(pwd)/mlflow_login_helper.sh
