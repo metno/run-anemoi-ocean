@@ -1,1 +1,0 @@
-anemoi-training mlflow login --url https://mlflow.ecmwf.int
