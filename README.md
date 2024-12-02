@@ -1,3 +1,17 @@
+# Overview
+`run-amemoi` is a collection of utility scripts and packages to use anemoi-training.
+
+# Anemoi-training on LUMI
+Use of virtual python environments is strongly dicouraged on LUMI, with a container based approach being the prefered solution. Therefore we use a singularity container which contains the entire software environment except for the anemoi repositories themselves (training, graphs, models, datasets, utils). These are installed in a lightweight virtual environment that we load on top of the container, which enables us to edit these packages without rebuilding the container. 
+- The virtual environment is set up by executing `bash make_env.sh` in /lumi.
+This will download the anemoi-packages and install this in a .venv folder inside /lumi.
+
+You can now train a model through the following steps:
+- Setup the desider model config file and make sure it is placed in /lumi. **This file should not be named `config.yaml` or any other config name allready in anemoi-training.
+- Specify the config file name in `lumi_jobscript.sh` along with preferred sbatch settings for the job.
+- Submit the job with `sbatch lumi_jobscript.sh`
+
+
 # Automatized AnemoI training with SLURM
 `autorun-anemoi` is a lightweight Python package for submitting Anemoi training runs to the SLURM queue.
 
