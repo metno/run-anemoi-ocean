@@ -1,6 +1,6 @@
 #!/bin/bash
-#SBATCH --output=/scratch/project_465001383/%u/logs/%x.out
-#SBATCH --error=/scratch/project_465001383/%u/logs/%x.err
+#SBATCH --output=/scratch/project_465001383/%u/logs/%x_%j.out
+#SBATCH --error=/scratch/project_465001383/%u/logs/%x_%j.err
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=8
 #SBATCH --account=project_465001383
