@@ -1,8 +1,6 @@
 #!/bin/bash
 
-cd /pfs/lustrep4/$(pwd)
-
-export VIRTUAL_ENV="$(pwd)/.venv"
+export VIRTUAL_ENV="$(pwd -P)/.venv"
 if [ ! -d "$VIRTUAL_ENV" ]; then
     mkdir -p $VIRTUAL_ENV/lib $VIRTUAL_ENV/bin
 fi
