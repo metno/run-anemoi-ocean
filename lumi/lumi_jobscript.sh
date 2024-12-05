@@ -1,6 +1,6 @@
 #!/bin/bash
-#SBATCH --output=/scratch/project_465001383/%u/logs/%x_%j.out
-#SBATCH --error=/scratch/project_465001383/%u/logs/%x_%j.err
+#SBATCH --output=/users/%u/%x_%j.out
+#SBATCH --error=/users/%u/%x_%j.err
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=8
 #SBATCH --account=project_465001383
@@ -16,10 +16,10 @@ CONFIG_NAME=CONFIGNAME.yaml #This file should be located in run-anemoi/lumi
 
 #Should not have to change these
 PROJECT_DIR=/scratch/$SLURM_JOB_ACCOUNT
-CONTAINER_SCRIPT=$(pwd)/run_pytorch.sh
-CONFIG_DIR=$(pwd)
+CONTAINER_SCRIPT=$(pwd -P)/run_pytorch.sh
+CONFIG_DIR=$(pwd -P)
 CONTAINER=$PROJECT_DIR/aifs/container/containers/anemoi-training-pytorch-2.2.2-rocm-5.6.1-py-3.11.5.sif
-VENV=$(pwd)/.venv
+VENV=$(pwd -P)/.venv
 export VIRTUAL_ENV=$VENV
 
 module load LUMI/23.09 partition/G
