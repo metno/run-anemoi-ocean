@@ -37,8 +37,24 @@ export NCCL_DEBUG_SUBSYS=INIT,COLL
 # Set interfaces to be used by RCCL.
 # This is needed as otherwise RCCL tries to use a network interface it has
 # no access to on LUMI.
-export NCCL_SOCKET_IFNAME=hsn0,hsn1,hsn2,hsn3
-export NCCL_NET_GDR_LEVEL=COL
+# new implementation
+export NCCL_P2P_DISABLE=0
+export NCCL_IB_PCI_RELAXED_ORDERING=1
+
+# old implementation
+export NCCL_SOCKET_IFNAME=hsn0,hsn1 #,hsn2,hsn3
+export NCCL_NET_GDR_LEVEL=3 #COL
+export NCCL_IB_GID_INDEX=3
+
+# RCCL specific optimization (new implementation)
+export RCCL_NIC=hsn0,hsn1
+export RCCL_SOCKET_IFNAME=hsn0,hsn1
+export RCCL_BUFFSIZE=16777216 #16mb buff size #8388608
+export RCCL_THREADS=8
+
+# Enable RCCL logging for debugging
+export RCCL_DEBUG=INFO
+export RCCL_DEBUG_SUBSYS=ALL
 
 # Set ROCR_VISIBLE_DEVICES so that each task uses the proper GPU
 #export ROCR_VISIBLE_DEVICES=1,2,3,4 #$SLURM_LOCALID
