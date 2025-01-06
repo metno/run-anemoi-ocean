@@ -92,4 +92,11 @@ export AIFS_BASE_SEED=1337420
 export PYTHONUSERBASE=$VIRTUAL_ENV
 export PATH=$PATH:$VIRTUAL_ENV/bin
 
-anemoi-training train --config-dir=$1 --config-name=$2
+# Check if anemoi-core is installed by checking if the directory exists
+if python -c "import anemoi_core" &> /dev/null; then
+    echo "anemoi-core is installed, running anemoi-core training"
+    anemoi-core/training train --config-dir=$1 --config-name=$2
+else
+    echo "anemoi-core not found, falling back to anemoi-training"
+    anemoi-training train --config-dir=$1 --config-name=$2
+fi
