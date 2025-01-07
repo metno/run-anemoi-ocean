@@ -8,18 +8,28 @@ fi
 export PYTHONUSERBASE=$VIRTUAL_ENV
 export PATH=$PATH:$VIRTUAL_ENV/bin
 
-# Install core and datasets
-for repo in core datasets; do
-    if [ ! -d anemoi-$repo ]; then
-        echo "Cloning anemoi-$repo"
-        git clone git@github.com:metno/anemoi-$repo.git
-    fi
-    pip install --user --no-deps -e anemoi-$repo
-done
+# Clone anemoi-core if not already cloned
+if [ ! -d anemoi-core ]; then
+    echo "Cloning anemoi-core"
+    git clone git@github.com:ecmwf/anemoi-core.git
+fi
 
-# Install utils
+# Install training, models, and graphs from anemoi-core
+echo "Installing training, models, and graphs from anemoi-core"
+pip install --user --no-deps -e anemoi-core/training
+pip install --user --no-deps -e anemoi-core/models
+pip install --user --no-deps -e anemoi-core/graphs
+
+# Clone and install utils if not already cloned
 if [ ! -d anemoi-utils ]; then
     echo "Cloning anemoi-utils"
     git clone git@github.com:ecmwf/anemoi-utils.git
 fi
 pip install --user --no-deps -e anemoi-utils
+
+# Clone and install datasets if not already cloned
+if [ ! -d anemoi-datasets ]; then
+    echo "Cloning anemoi-datasets"
+    git clone git@github.com:metno/anemoi-datasets.git
+fi
+pip install --user --no-deps -e anemoi-datasets
