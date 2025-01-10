@@ -92,11 +92,4 @@ export AIFS_BASE_SEED=1337420
 export PYTHONUSERBASE=$VIRTUAL_ENV
 export PATH=$PATH:$VIRTUAL_ENV/bin
 
-# Check if anemoi-core exists as a directory
-if [ -d "anemoi-core" ]; then
-    echo "anemoi-core directory found, running anemoi-core training"
-    ./anemoi-core/training train --config-dir=$1 --config-name=$2
-else
-    echo "anemoi-core directory not found, falling back to anemoi-training"
-    anemoi-training train --config-dir=$1 --config-name=$2
-fi
+./anemoi-core/training train --config-dir=$1 --config-name=$2
