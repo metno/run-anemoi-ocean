@@ -2,7 +2,7 @@ PROJECT_DIR=/pfs/lustrep4/scratch/$SLURM_JOB_ACCOUNT
 CONTAINER_SCRIPT=$PROJECT_DIR/aifs/run-pytorch/run-pytorch.sh
 
 #CHANGE THESE:
-CONTAINER=$PROJECT_DIR/aifs/container/containers/aifs-met-pytorch-2.2.0-rocm-5.6.1-py3.9-v2.0-new-correct-anemoi-models-sort-vars.sif
+CONTAINER=$PROJECT_DIR/container/ocean-ai-trimedge.sif
 
 module load LUMI/23.09 partition/G
 

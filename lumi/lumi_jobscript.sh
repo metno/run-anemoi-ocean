@@ -1,24 +1,24 @@
 #!/bin/bash
-#SBATCH --output=/users/%u/%x_%j.out
-#SBATCH --error=/users/%u/%x_%j.err
+#SBATCH --output=/users/%u/output/%x_%j.out
+#SBATCH --error=/users/%u/output/%x_%j.err
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=8
-#SBATCH --account=project_465001383
+#SBATCH --account=project_465001629
 #SBATCH --partition=standard-g
 #SBATCH --gpus-per-node=8
 #SBATCH --time=24:00:00
-#SBATCH --job-name=aifs
+#SBATCH --job-name=ocean-ai
 #SBATCH --exclusive
 
 
 #Change this
-CONFIG_NAME=CONFIGNAME.yaml #This file should be located in run-anemoi/lumi
+CONFIG_NAME=main.yaml #This file should be located in run-anemoi/lumi (or run-anemoi-ocean/lumi)
 
 #Should not have to change these
 PROJECT_DIR=/scratch/$SLURM_JOB_ACCOUNT
 CONTAINER_SCRIPT=$(pwd -P)/run_pytorch.sh
 CONFIG_DIR=$(pwd -P)
-CONTAINER=$PROJECT_DIR/aifs/container/containers/anemoi-training-pytorch-2.2.2-rocm-5.6.1-py-3.11.5.sif
+CONTAINER=$PROJECT_DIR/container/ocean-ai-trimedge.sif
 VENV=$(pwd -P)/.venv
 export VIRTUAL_ENV=$VENV
 
