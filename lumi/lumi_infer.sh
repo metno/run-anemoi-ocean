@@ -3,11 +3,11 @@
 #SBATCH --error=/users/%u/%x_%j.err
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=8
-#SBATCH --account=project_465001383
+#SBATCH --account=project_465001629
 #SBATCH --partition=dev-g
 #SBATCH --gpus-per-node=8
 #SBATCH --time=01:00:00
-#SBATCH --job-name=infer
+#SBATCH --job-name=infer-ocean
 #SBATCH --exclusive
 
 
@@ -19,7 +19,7 @@ PROJECT_DIR=/scratch/$SLURM_JOB_ACCOUNT
 CONTAINER_SCRIPT=$(pwd -P)/run_pytorch_infer.sh
 chmod 770 ${CONTAINER_SCRIPT}
 CONFIG_DIR=$(pwd -P)
-CONTAINER=$PROJECT_DIR/aifs/container/containers/bris-inference-pytorch-2.2.2-rocm-5.6.61-py-3.11.5.sif
+CONTAINER=$PROJECT_DIR/container/ocean-ai.sif
 VENV=$(pwd -P)/.venv
 export VIRTUAL_ENV=$VENV
 
