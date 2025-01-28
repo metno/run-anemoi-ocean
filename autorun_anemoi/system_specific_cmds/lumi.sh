@@ -1,5 +1,5 @@
-PROJECT_DIR=/pfs/lustrep4/scratch/$SLURM_JOB_ACCOUNT
-CONTAINER_SCRIPT=/pfs/lustrep4/projappl/$SLURM_JOB_ACCOUNT/ina/ocean-ai/run-pytorch.sh
+PROJECT_DIR=/pfs/lustrep2/scratch/$SLURM_JOB_ACCOUNT
+CONTAINER_SCRIPT=/pfs/lustrep2/projappl/$SLURM_JOB_ACCOUNT/ina/ocean-ai/run-pytorch.sh
 
 #CHANGE THESE:
 CONTAINER=$PROJECT_DIR/container/ocean-ai.sif
