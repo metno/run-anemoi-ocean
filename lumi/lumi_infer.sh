@@ -6,20 +6,20 @@
 #SBATCH --account=project_465001629
 #SBATCH --partition=dev-g
 #SBATCH --gpus-per-node=8
-#SBATCH --time=01:00:00
+#SBATCH --time=00:20:00
 #SBATCH --job-name=infer-ocean
 #SBATCH --exclusive
 
 
 #Change this
-CONFIG_NAME= #Full path
+CONFIG_NAME=/pfs/lustrep2/projappl/project_465001629/ina/run-anemoi-ocean/template_config.yaml  #Full path
 
 #Should not have to change these
 PROJECT_DIR=/scratch/$SLURM_JOB_ACCOUNT
 CONTAINER_SCRIPT=$(pwd -P)/run_pytorch_infer.sh
 chmod 770 ${CONTAINER_SCRIPT}
 CONFIG_DIR=$(pwd -P)
-CONTAINER=$PROJECT_DIR/container/ocean-ai.sif
+CONTAINER=$PROJECT_DIR/container/ocean-ai-infer.sif
 VENV=$(pwd -P)/.venv
 export VIRTUAL_ENV=$VENV
 
@@ -37,6 +37,5 @@ srun --cpu-bind=$CPU_BIND \
                      -B /var/spool/slurmd \
                      -B /opt/cray \
                      -B /usr/lib64 \
-                     -B /usr/lib64/libjansson.so.4 \
         $CONTAINER $CONTAINER_SCRIPT $CONFIG_NAME
 
