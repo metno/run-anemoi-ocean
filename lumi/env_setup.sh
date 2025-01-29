@@ -13,7 +13,7 @@ for repo in datasets models training graphs; do
         echo "Cloning $repo"
         git clone https://github.com/metno/anemoi-$repo.git
     fi
-    pip install --user --no-deps -e anemoi-$repo
+    pip install --user -e anemoi-$repo
 done
 
 for repo in utils; do
@@ -21,7 +21,7 @@ for repo in utils; do
         echo "Cloning $repo"
         git clone https://github.com/ecmwf/anemoi-$repo.git
     fi
-    pip install --user --no-deps -e anemoi-$repo
+    pip install --user -e anemoi-$repo
 done
 
    
