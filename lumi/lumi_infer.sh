@@ -3,28 +3,24 @@
 #SBATCH --error=/users/%u/%x_%j.err
 #SBATCH --nodes=2
 #SBATCH --ntasks-per-node=8
-#SBATCH --account=project_465001383
+#SBATCH --account=project_465001629
 #SBATCH --partition=dev-g
 #SBATCH --gpus-per-node=8
-#SBATCH --time=01:00:00
-#SBATCH --job-name=infer
+#SBATCH --time=00:20:00
+#SBATCH --job-name=infer-ocean
 #SBATCH --exclusive
 
-
-#Change this
-CONFIG_NAME= #Full path
-
+CONFIG_NAME=/pfs/lustrep2/projappl/project_465001629/ina/run-anemoi-ocean/template_config.yaml
 
 #Should not have to change these
 PROJECT_DIR=/scratch/$SLURM_JOB_ACCOUNT
 CONTAINER_SCRIPT=$(pwd -P)/run_pytorch_infer.sh
 chmod 770 ${CONTAINER_SCRIPT}
 CONFIG_DIR=$(pwd -P)
-CONTAINER=$PROJECT_DIR/aifs/container/containers/bris-inference-pytorch-2.2.2-rocm-5.6.61-py-3.11.5-v2.sif
+CONTAINER=$PROJECT_DIR/container/ocean-ai-infer.sif
 VENV=$(pwd -P)/.venv
 export VIRTUAL_ENV=$VENV
 
-#module load LUMI/23.09 partition/G
 module load LUMI/24.03 partition/G
 export SINGULARITYENV_LD_LIBRARY_PATH=/opt/ompi/lib:${EBROOTAWSMINOFIMINRCCL}/lib:/opt/cray/xpmem/2.4.4-2.3_9.1__gff0e1d9.shasta/lib64:${SINGULARITYENV_LD_LIBRARY_PATH}
 
@@ -38,6 +34,5 @@ srun --cpu-bind=$CPU_BIND \
                      -B /var/spool/slurmd \
                      -B /opt/cray \
                      -B /usr/lib64 \
-                     -B /usr/lib64/libjansson.so.4 \
         $CONTAINER $CONTAINER_SCRIPT $CONFIG_NAME
 

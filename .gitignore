@@ -1,1 +1,4 @@
 /lumi/.venv
+.vscode
+__pycache__
+tmp_dir
