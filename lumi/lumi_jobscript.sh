@@ -1,24 +1,23 @@
 #!/bin/bash
-#SBATCH --output=output/output.o%j
+#SBATCH --output=outputs/output.o%j
 #SBATCH --error=outputs/error.e%j
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=8
 #SBATCH --account=project_465001629
-#SBATCH --partition=standard-g
+#SBATCH --partition=dev-g
 #SBATCH --gpus-per-node=8
-#SBATCH --time=24:00:00
-#SBATCH --job-name=ocean-ai
+#SBATCH --time=00:10:00
+#SBATCH --job-name=ocean-ai-mlflow
 #SBATCH --exclusive
 
-#Change this
-CONFIG_NAME=main.yaml #This file should be located in run-anemoi/lumi (or run-anemoi-ocean/lumi)
+CONFIG_NAME=main.yaml 
 
 #Should not have to change these
-PROJECT_DIR=/scratch/$SLURM_JOB_ACCOUNT
+PROJECT_DIR=/pfs/lustrep2/scratch/$SLURM_JOB_ACCOUNT
 CONTAINER_SCRIPT=$(pwd -P)/run_pytorch.sh
 CONFIG_DIR=$(pwd -P)
 CONTAINER=$PROJECT_DIR/container/ocean-ai.sif
-VENV=/pfs/lustrep2/projappl/project_465001629/python-envs/anemoi-env-trimedge
+VENV=$(pwd -P)/.venv # use venv installed in this dir
 export VIRTUAL_ENV=$VENV
 
 module load LUMI/24.03 partition/G
@@ -29,8 +28,7 @@ CPU_BIND="mask_cpu:fe000000000000,fe00000000000000,fe0000,fe000000,fe,fe00,fe000
 
 # run run-pytorch.sh in singularity container like recommended
 # in LUMI doc: https://lumi-supercomputer.github.io/LUMI-EasyBuild-docs/p/PyTorch
-#srun --cpu-bind=$CPU_BIND \ # TODO: Use cpu bind later!
-srun \
+srun --cpu-bind=$CPU_BIND \ 
     singularity exec -B /pfs:/pfs \
                      -B /var/spool/slurmd \
                      -B /opt/cray \

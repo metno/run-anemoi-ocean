@@ -13,15 +13,17 @@ for repo in datasets models training graphs; do
         echo "Cloning $repo"
         git clone https://github.com/metno/anemoi-$repo.git
     fi
-    pip install --user -e anemoi-$repo
+    pip install --user --no-deps -e anemoi-$repo
 done
+
+pip install aniso8601 # TODO add this depependency in container!
 
 for repo in utils; do
     if [ ! -d anemoi-$repo ]; then
         echo "Cloning $repo"
         git clone https://github.com/ecmwf/anemoi-$repo.git
     fi
-    pip install --user -e anemoi-$repo
+    pip install --user --no-deps -e anemoi-$repo
 done
 
    
