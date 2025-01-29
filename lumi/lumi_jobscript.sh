@@ -18,7 +18,6 @@ PROJECT_DIR=/scratch/$SLURM_JOB_ACCOUNT
 CONTAINER_SCRIPT=$(pwd -P)/run_pytorch.sh
 CONFIG_DIR=$(pwd -P)
 CONTAINER=$PROJECT_DIR/container/ocean-ai.sif
-#VENV=$(pwd -P)/.venv # TODO: Change below line to use this
 VENV=/pfs/lustrep2/projappl/project_465001629/python-envs/anemoi-env-trimedge
 export VIRTUAL_ENV=$VENV
 
@@ -36,7 +35,5 @@ srun \
                      -B /var/spool/slurmd \
                      -B /opt/cray \
                      -B /usr/lib64 \
-                     -B /scratch/project_465001629 \
-                     -B /projappl/project_465001629 \
         $CONTAINER $CONTAINER_SCRIPT $CONFIG_DIR $CONFIG_NAME
 

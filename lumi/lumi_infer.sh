@@ -10,9 +10,7 @@
 #SBATCH --job-name=infer-ocean
 #SBATCH --exclusive
 
-
-#Change this
-CONFIG_NAME=/pfs/lustrep2/projappl/project_465001629/ina/run-anemoi-ocean/template_config.yaml  #Full path
+CONFIG_NAME=/pfs/lustrep2/projappl/project_465001629/ina/run-anemoi-ocean/template_config.yaml
 
 #Should not have to change these
 PROJECT_DIR=/scratch/$SLURM_JOB_ACCOUNT
@@ -23,7 +21,6 @@ CONTAINER=$PROJECT_DIR/container/ocean-ai-infer.sif
 VENV=$(pwd -P)/.venv
 export VIRTUAL_ENV=$VENV
 
-#module load LUMI/23.09 partition/G
 module load LUMI/24.03 partition/G
 export SINGULARITYENV_LD_LIBRARY_PATH=/opt/ompi/lib:${EBROOTAWSMINOFIMINRCCL}/lib:/opt/cray/xpmem/2.4.4-2.3_9.1__gff0e1d9.shasta/lib64:${SINGULARITYENV_LD_LIBRARY_PATH}
 
