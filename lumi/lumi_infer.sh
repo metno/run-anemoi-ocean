@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --output=/users/%u/%x_%j.out
 #SBATCH --error=/users/%u/%x_%j.err
-#SBATCH --nodes=1
+#SBATCH --nodes=2
 #SBATCH --ntasks-per-node=8
 #SBATCH --account=project_465001629
 #SBATCH --partition=dev-g
