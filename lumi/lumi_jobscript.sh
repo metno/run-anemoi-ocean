@@ -7,10 +7,10 @@
 #SBATCH --partition=standard-g
 #SBATCH --gpus-per-node=8
 #SBATCH --time=00:20:00
-#SBATCH --job-name=ocean-ai-mlflow
+#SBATCH --job-name=ocean-ai-h
 #SBATCH --exclusive
 
-CONFIG_NAME=main.yaml 
+CONFIG_NAME=main.yaml
 
 #Should not have to change these
 PROJECT_DIR=/pfs/lustrep2/scratch/$SLURM_JOB_ACCOUNT
@@ -34,4 +34,6 @@ srun --cpu-bind=$CPU_BIND \
                      -B /var/spool/slurmd \
                      -B /opt/cray \
                      -B /usr/lib64 \
+                     -B /scratch/project_465001629 \
+                     -B /projappl/project_465001629 \
         $CONTAINER $CONTAINER_SCRIPT $CONFIG_DIR $CONFIG_NAME
