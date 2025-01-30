@@ -77,7 +77,7 @@ diagnostics:
     mlflow:
       enabled: False
       offline: False
-      experiment_name: 'metno'
+      experiment_name: 'metno-fou'
       run_name: ${training.run_id}
   print_memory_summary: True
 
