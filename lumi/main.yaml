@@ -34,7 +34,7 @@ dataloader:
     mask_from_dataset:
       dataset: /pfs/lustrep2/scratch/project_465001629/datasets/mask_norkyst_2024.zarr
       field: land_binary_mask_0
- dataset2:
+  dataset2:
     dataset: ${hardware.paths.data}/${hardware.files.dataset2}
     mask_from_dataset:
       dataset: /pfs/lustrep2/scratch/project_465001629/datasets/mask_norkyst_2024.zarr
