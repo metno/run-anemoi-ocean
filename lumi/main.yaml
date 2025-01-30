@@ -29,11 +29,17 @@ dataloader:
 
   dataset:
     dataset: ${hardware.paths.data}/${hardware.files.dataset}
-    dataset2: ${hardware.paths.data}/${hardware.files.dataset2}
+    #dataset2: ${hardware.paths.data}/${hardware.files.dataset2}
     #trimedge branch
     mask_from_dataset:
       dataset: /pfs/lustrep2/scratch/project_465001629/datasets/mask_norkyst_2024.zarr
       field: land_binary_mask_0
+ dataset2:
+    dataset: ${hardware.paths.data}/${hardware.files.dataset2}
+    mask_from_dataset:
+      dataset: /pfs/lustrep2/scratch/project_465001629/datasets/mask_norkyst_2024.zarr
+      field: land_binary_mask_0
+
 
   limit_batches:
     training: null
@@ -46,6 +52,7 @@ dataloader:
     end: 2024-01-02
     dataset:
         - dataset: ${dataloader.dataset}
+        #- dataset2: ${hardware.paths.data}/${hardware.files.dataset2}
         - dataset2: ${dataloader.dataset2}
     frequency: 1
   validation:
