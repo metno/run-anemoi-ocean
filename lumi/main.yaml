@@ -52,14 +52,14 @@ dataloader:
     start: 2024-01-03
     end: 2024-01-04
     dataset:
-        - dataset: ${dataloader.dataset}
+        - dataset: ${dataloader.dataset.dataset}
         #- dataset2: ${dataloader.dataset2}
     frequency: 1
   test:
     start: 2024-01-01
     end: 2024-01-04
     dataset:
-        - dataset: ${dataloader.dataset}
+        - dataset: ${dataloader.dataset.dataset}
         #- dataset2: ${dataloader.dataset2}
     frequency: 1
 
@@ -73,6 +73,7 @@ hardware:
     output: /pfs/lustrep2/scratch/project_465001629/outputs/
     graph: /pfs/lustrep2/scratch/project_465001629/graphs/
   files:
+    #dataset:
     dataset: prepro_norkyst_tests/norkyst800_his_zdepth_2024_m00_AN_ml.zarr
     dataset2: ../h_norkyst_2024.zarr
     graph: graph-17-12-res7.pt
