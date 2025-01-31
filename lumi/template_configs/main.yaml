@@ -78,10 +78,12 @@ diagnostics:
     callbacks: []
   log:
     mlflow:
-      enabled: False
-      offline: False
+      enabled: True
+      offline: True
+      authentication: True
+      tracking_uri: https://mlflow.ecmwf.int
       experiment_name: 'metno-fou'
-      run_name: ${training.run_id}
+      run_name: your_descriptive_run_name #change this
   print_memory_summary: True
 
 # Set clobber: False and specify the correct path and file in hardware to load graph, the path below is 

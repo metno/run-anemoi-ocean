@@ -33,3 +33,7 @@ for repo in utils; do
     fi
     pip install --user --no-deps -e anemoi-$repo
 done
+
+# Get the mlflow package to do offline sync
+# Recomended way to install from README on GitHub
+pip install git+https:///github.com/mlflow/mlflow-export-import/#egg=mlflow-export-import
