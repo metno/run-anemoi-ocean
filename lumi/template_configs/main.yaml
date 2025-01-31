@@ -160,13 +160,7 @@ data:
     #legge til flere variabler her når vi har det
     default: "none"
     999:
-  #    - temperature_0
-  #    - temperature_1
-  #    - temperature_2
-  #    - temperature_3
-  #    - temperature_5
-  #    - temperature_7
-  #    - temperature_10
+  #    - temperature_0 # ERROR if try to impute vars that dont have NaNs. Ok to list vars not in dataset (if use select)
       - temperature_15
       - temperature_25
       - temperature_50

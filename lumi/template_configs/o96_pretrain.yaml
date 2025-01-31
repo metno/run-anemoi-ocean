@@ -64,7 +64,7 @@ dataloader:
     start: 1979-01-01
     end: 2021-12-31
     drop: ['sdor', 'slor', 'cp', 'u_600', 'v_600', 'z_600', 't_600', 'q_600', 'w_600']
-    reorder: ${reorder}
+    reorder: ${reorder} # this is needed to transfer learning, order of vars have to be the same
     statistics: ${hardware.paths.data}/ERA5/aifs-od-an-oper-0001-mars-n320-2019-2023-6h-v6.zarr
 
   validation:
