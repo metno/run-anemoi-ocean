@@ -1,4 +1,4 @@
-xdefaults:
+defaults:
 - data: zarr
 - dataloader: native_grid
 - diagnostics: evaluation
@@ -10,9 +10,9 @@ xdefaults:
 - override hydra/job_logging: disabled
 - _self_
 
-hydra:
-  output_subdir: null
-  run:
+hydra:  
+  output_subdir: null  
+  run:  
     dir: .
 
 dataloader:
@@ -29,19 +29,12 @@ dataloader:
 
   dataset:
     dataset: ${hardware.paths.data}/${hardware.files.dataset}
-    #dataset2: ${hardware.paths.data}/${hardware.files.dataset2}
     #trimedge branch
     mask_from_dataset:
       dataset: /pfs/lustrep2/scratch/project_465001629/datasets/mask_norkyst_2024.zarr
       field: land_binary_mask_0
-  dataset2:
-    dataset: ${hardware.paths.data}/${hardware.files.dataset2}
-    mask_from_dataset:
-      dataset: /pfs/lustrep2/scratch/project_465001629/datasets/mask_norkyst_2024.zarr
-      field: land_binary_mask_0
 
-
-  limit_batches:
+  limit_batches: 
     training: null
     validation: null
     test: null
@@ -50,24 +43,17 @@ dataloader:
   training:
     start: 2024-01-01
     end: 2024-01-02
-    dataset:
-        - dataset: ${dataloader.dataset}
-        #- dataset2: ${hardware.paths.data}/${hardware.files.dataset2}
-        - dataset2: ${dataloader.dataset2}
+    dataset: ${dataloader.dataset} 
     frequency: 1
   validation:
-    start: 2024-01-03
-    end: 2024-01-04
-    dataset:
-        - dataset: ${dataloader.dataset.dataset}
-        #- dataset2: ${dataloader.dataset2}
+    start: 2024-01-02
+    end: 2024-01-03
+    dataset: ${dataloader.dataset}
     frequency: 1
   test:
     start: 2024-01-01
-    end: 2024-01-04
-    dataset:
-        - dataset: ${dataloader.dataset.dataset}
-        #- dataset2: ${dataloader.dataset2}
+    end: 2024-01-03
+    dataset: ${dataloader.dataset}
     frequency: 1
 
 hardware:
@@ -80,14 +66,15 @@ hardware:
     output: /pfs/lustrep2/scratch/project_465001629/outputs/
     graph: /pfs/lustrep2/scratch/project_465001629/graphs/
   files:
-    #dataset:
-    dataset: prepro_norkyst_tests/norkyst800_his_zdepth_2024_m00_AN_ml.zarr
-    dataset2: h_norkyst_2024.zarr
+    dataset: 
+      join:
+        - prepro_norkyst_tests/norkyst800_his_zdepth_2024_m00_AN_ml.zarr
+        - h_norkyst_2024.zarr
     graph: graph-31-01.pt
     warm_start: null #specific checkpoint to start from, defaults to last.ckpt
 
 diagnostics:
-  plot:
+  plot: 
     callbacks: []
   log:
     mlflow:
@@ -102,7 +89,7 @@ diagnostics:
 graph:
   overwrite: False
   nodes:
-    data:
+    data: 
       node_builder:
         _target_: anemoi.graphs.nodes.ZarrDatasetNodes # options: ZarrDatasetNodes, NPZFileNodes
         dataset: ${dataloader.training.dataset}
@@ -150,7 +137,7 @@ data:
   frequency: 1h
   timestep: 1h
   format: zarr
-  forcing: [h]
+  forcing: []
 
   diagnostic: []
 
@@ -225,7 +212,7 @@ data:
       _target_: anemoi.models.preprocessing.normalizer.InputNormalizer
       _convert_: all
       config: ${data.normalizer}
-
+    
     imputer:
       _target_: anemoi.models.preprocessing.imputer.ConstantImputer
       _convert_: all
@@ -236,7 +223,7 @@ data:
 
 
 model:
-  num_channels: 1024
+  num_channels: 512
   trainable_parameters:
     data: 0
     hidden: 0
