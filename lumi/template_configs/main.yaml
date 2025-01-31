@@ -28,7 +28,11 @@ dataloader:
     predict: 1
 
   dataset:
-    dataset: ${hardware.paths.data}/${hardware.files.dataset}
+    dataset:
+      join:
+        - ${hardware.paths.data}/${hardware.files.dataset_1}
+        - ${hardware.paths.data}/${hardware.files.dataset_2}
+      adjust: [dates]
     #trimedge branch
     mask_from_dataset:
       dataset: /pfs/lustrep2/scratch/project_465001629/datasets/mask_norkyst_2024.zarr
@@ -69,10 +73,8 @@ hardware:
     output: /pfs/lustrep2/scratch/project_465001629/experiments/exp-name/
     graph: /pfs/lustrep2/scratch/project_465001629/graphs/
   files:
-    dataset: 
-      join:
-        - prepro_norkyst_tests/norkyst800_his_zdepth_2024_m00_AN_ml.zarr
-        - h_norkyst_2024.zarr
+    dataset_1: prepro_norkyst_tests/norkyst800_his_zdepth_2024_m00_AN_ml.zarr
+    dataset_2: h_norkyst_2024.zarr
     graph: graph-17-12-res7.pt
     warm_start: null #specific checkpoint to start from, defaults to last.ckpt
 
