@@ -6,7 +6,7 @@ if [ ! -d "$VIRTUAL_ENV" ]; then
 fi
 
 export PYTHONUSERBASE=$VIRTUAL_ENV
-export PATH=$PATH:VIRTUAL_ENV/bin
+export PATH=$PATH:$VIRTUAL_ENV/bin
 
 for repo in datasets models training graphs; do
     if [ ! -d anemoi-$repo ]; then
@@ -33,3 +33,7 @@ for repo in utils; do
     fi
     pip install --user --no-deps -e anemoi-$repo
 done
+
+# Get the mlflow package to do offline sync
+# Recomended way to install from README on GitHub
+pip install git+https:///github.com/mlflow/mlflow-export-import/#egg=mlflow-export-import

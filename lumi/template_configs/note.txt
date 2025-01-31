@@ -1,1 +1,0 @@
-main.yaml updated 24.01.2025 - this was used to train large model with all vars. 

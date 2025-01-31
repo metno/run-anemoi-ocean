@@ -6,7 +6,7 @@ if [ ! -d "$VIRTUAL_ENV" ]; then
 fi
 
 export PYTHONUSERBASE=$VIRTUAL_ENV
-export PATH=$PATH:VIRTUAL_ENV/bin
+export PATH=$PATH:$VIRTUAL_ENV/bin
 
 if [ ! -d bris-inference ]; then
     echo "Cloning bris-inference"
