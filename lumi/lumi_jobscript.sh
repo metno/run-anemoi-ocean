@@ -1,13 +1,13 @@
 #!/bin/bash
-#SBATCH --output=outputs/output.o%j
-#SBATCH --error=outputs/error.e%j
+#SBATCH --output=outputs/%x_%j.out
+#SBATCH --error=outputs/%x_%j.err
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=8
 #SBATCH --account=project_465001629
 #SBATCH --partition=standard-g
 #SBATCH --gpus-per-node=8
 #SBATCH --time=00:20:00
-#SBATCH --job-name=ocean-ai-mlflow
+#SBATCH --job-name=ocean-ai
 #SBATCH --exclusive
 
 CONFIG_NAME=main.yaml 
