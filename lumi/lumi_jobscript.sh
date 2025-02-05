@@ -15,6 +15,7 @@ CONFIG_NAME=main.yaml
 #Should not have to change these
 PROJECT_DIR=/pfs/lustrep2/scratch/$SLURM_JOB_ACCOUNT
 CONTAINER_SCRIPT=$(pwd -P)/run_pytorch.sh
+chmod 770 ${CONTAINER_SCRIPT}
 CONFIG_DIR=$(pwd -P)
 CONTAINER=$PROJECT_DIR/container/ocean-ai.sif
 VENV=$(pwd -P)/.venv # use venv installed in this dir
