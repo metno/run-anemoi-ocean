@@ -34,8 +34,6 @@ CPU_BIND="mask_cpu:7e000000000000,7e00000000000000"
 CPU_BIND="${CPU_BIND},7e0000,7e000000"
 CPU_BIND="${CPU_BIND},7e,7e00"
 CPU_BIND="${CPU_BIND},7e00000000,7e0000000000"
-# MPI + OpenMP bindings: https://docs.lumi-supercomputer.eu/runjobs/scheduled-jobs/distribution-binding
-CPU_BIND="mask_cpu:fe000000000000,fe00000000000000,fe0000,fe000000,fe,fe00,fe00000000,fe0000000000"
 
 # run run-pytorch.sh in singularity container like recommended
 # in LUMI doc: https://lumi-supercomputer.github.io/LUMI-EasyBuild-docs/p/PyTorch
