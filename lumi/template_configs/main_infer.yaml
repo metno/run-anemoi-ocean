@@ -72,6 +72,8 @@ routing:
       - netcdf: 
           filename_pattern: ${hardware.paths.output}/predictions/template_pred_%Y%m%dT%HZ.nc
           variables: [u_eastward_1,v_northward_1,temperature_1,salinity_1,zeta] # Leave this empty to include all variables (?)
+          mask_file: /pfs/lustrep2/scratch/project_465001629/datasets/surface_mask.nc
+          mask_field: land_binary_mask
           #extra_variables:  [] # Extra outputs (for instance windspeed is not an output from the model and is calculated for each prediction)
       #Create files for point verification - these can be used with the verif command line tool
       #- verif: 
