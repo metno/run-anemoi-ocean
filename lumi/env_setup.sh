@@ -19,9 +19,9 @@ for repo in datasets models training graphs; do
     pip install --user --no-deps -e anemoi-$repo
 done
 
-cd anemoi-datasets
-git checkout feature/trimedge
-cd ..
+#cd anemoi-datasets
+#git checkout feature/trimedge
+#cd ..
 
 for repo in utils; do
     if [ ! -d anemoi-$repo ]; then
