@@ -20,7 +20,7 @@ dataset:
   dataset: ${hardware.paths.data}/${hardware.files.dataset}
     #trimedge branch
   mask_from_dataset:
-    dataset: /pfs/lustrep2/scratch/project_465001629/datasets/mask_norkyst_2024.zarr
+    dataset: /pfs/lustrep2/scratch/project_465001902/datasets/mask_norkyst_2024.zarr
     field: land_binary_mask_0
 
 # If the user wants to release GPU cache and memory
@@ -48,10 +48,10 @@ dataloader:
 
 hardware:
   paths:
-    data: /pfs/lustrep2/scratch/project_465001629/datasets/ 
+    data: /pfs/lustrep2/scratch/project_465001902/datasets/ 
     workdir: ${hardware.paths.output} 
     #workdir: #Required verif filer (temp write dir
-    output: /pfs/lustrep2/scratch/project_465001629/experiments/exp-name/ #change this
+    output: /pfs/lustrep2/scratch/project_465001902/experiments/exp-name/ #change this
   files:
     dataset: prepro_norkyst_tests/norkyst800_his_zdepth_2024_m00_AN_ml.zarr
 
@@ -72,7 +72,7 @@ routing:
       - netcdf: 
           filename_pattern: ${hardware.paths.output}/predictions/template_pred_%Y%m%dT%HZ.nc
           variables: [u_eastward_1,v_northward_1,temperature_1,salinity_1,zeta] # Leave this empty to include all variables (?)
-          mask_file: /pfs/lustrep2/scratch/project_465001629/datasets/surface_mask.nc
+          mask_file: /pfs/lustrep2/scratch/project_465001902/datasets/surface_mask.nc
           mask_field: land_binary_mask
           #extra_variables:  [] # Extra outputs (for instance windspeed is not an output from the model and is calculated for each prediction)
       #Create files for point verification - these can be used with the verif command line tool
