@@ -5,7 +5,7 @@ cd $(pwd -P)
 # Make files executable in the container (might not be needed)
 chmod 770 env_setup_infer.sh
 
-PROJECT_DIR=/pfs/lustrep2/scratch/project_465001629
+PROJECT_DIR=/pfs/lustrep2/scratch/project_465001902
 CONTAINER=$PROJECT_DIR/container/ocean-ai.sif
 
 # Clone and pip install anemoi repos from the container
