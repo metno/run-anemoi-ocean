@@ -20,7 +20,7 @@ dataset:
   dataset: ${hardware.paths.data}/${hardware.files.dataset}
     #trimedge branch
   mask_from_dataset:
-    dataset: /pfs/lustrep2/scratch/project_465001902/datasets/mask_norkyst_2024.zarr
+    dataset: /pfs/lustrep3/scratch/project_465001902/datasets/mask_norkyst_2024.zarr
     field: land_binary_mask_0
 
 # If the user wants to release GPU cache and memory
@@ -48,10 +48,10 @@ dataloader:
 
 hardware:
   paths:
-    data: /pfs/lustrep2/scratch/project_465001902/datasets/ 
+    data: /pfs/lustrep3/scratch/project_465001902/datasets/ 
     workdir: ${hardware.paths.output} 
     #workdir: #Required verif filer (temp write dir
-    output: /pfs/lustrep2/scratch/project_465001902/experiments/exp-name/ #change this
+    output: /pfs/lustrep3/scratch/project_465001902/experiments/exp-name/ #change this
   files:
     dataset: prepro_norkyst_tests/norkyst800_his_zdepth_2024_m00_AN_ml.zarr
 
@@ -72,7 +72,7 @@ routing:
       - netcdf: 
           filename_pattern: ${hardware.paths.output}/predictions/template_pred_%Y%m%dT%HZ.nc
           variables: [u_eastward_1,v_northward_1,temperature_1,salinity_1,zeta] # Leave this empty to include all variables (?)
-          mask_file: /pfs/lustrep2/scratch/project_465001902/datasets/surface_mask.nc
+          mask_file: /pfs/lustrep3/scratch/project_465001902/datasets/surface_mask.nc
           mask_field: land_binary_mask
           #extra_variables:  [] # Extra outputs (for instance windspeed is not an output from the model and is calculated for each prediction)
       #Create files for point verification - these can be used with the verif command line tool
@@ -85,7 +85,7 @@ routing:
       #    elev_gradient: -0.0065 #Gradient to use for height correction when interpolating forecast to station locations
       #    obs_sources: # Source of point observations. 
       #      - verif:
-      #          filename: /pfs/lustrep2/scratch/project_465001383/aifs/verification/nordic/6h/202206_202305/t2m/newref_n320_2.5k_7p10_r4.nc 
+      #          filename: /pfs/lustrep3/scratch/project_465001383/aifs/verification/nordic/6h/202206_202305/t2m/newref_n320_2.5k_7p10_r4.nc 
       #- verif:
       #    filename: ${hardware.paths.output}/verif/10si/template.nc
       #    variable: 10si
@@ -94,19 +94,19 @@ routing:
       #    units: m/s
       #    obs_sources:
       #      - verif:
-      #          filename: /pfs/lustrep2/scratch/project_465001383/aifs/verification/nordic/6h/202206_202305/ws10m/newref_n320_2.5k_7p10_r4.nc
+      #          filename: /pfs/lustrep3/scratch/project_465001383/aifs/verification/nordic/6h/202206_202305/ws10m/newref_n320_2.5k_7p10_r4.nc
       #- verif:
       #    filename: ${hardware.paths.output}/verif/msl/template.nc
       #    variable: msl
       #    units: hPa
       #    obs_sources:
       #      - verif:
-      #          filename: /pfs/lustrep2/scratch/project_465001383/aifs/verification/nordic/6h/202206_202305/mslp/newref_n320_2.5k_7p10_r4.nc
+      #          filename: /pfs/lustrep3/scratch/project_465001383/aifs/verification/nordic/6h/202206_202305/mslp/newref_n320_2.5k_7p10_r4.nc
       #- verif:
       #    filename: ${hardware.paths.output}/verif/tp/template.nc
       #    variable: tp
       #    units: kg/m^2
       #    obs_sources:
       #      - verif:
-      #          filename: /pfs/lustrep2/scratch/project_465001383/aifs/verification/nordic/6h/202206_202305/precip6h/newref_n320_2.5k_7p10_r4.nc
+      #          filename: /pfs/lustrep3/scratch/project_465001383/aifs/verification/nordic/6h/202206_202305/precip6h/newref_n320_2.5k_7p10_r4.nc
 

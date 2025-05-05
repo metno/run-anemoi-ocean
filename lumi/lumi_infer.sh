@@ -13,7 +13,7 @@
 CONFIG_NAME=$(pwd -P)/main_infer.yaml
 
 #Should not have to change these
-PROJECT_DIR=/pfs/lustrep2/scratch/$SLURM_JOB_ACCOUNT
+PROJECT_DIR=/pfs/lustrep3/scratch/$SLURM_JOB_ACCOUNT
 CONTAINER_SCRIPT=$(pwd -P)/run_pytorch_infer.sh
 chmod 770 ${CONTAINER_SCRIPT}
 CONFIG_DIR=$(pwd -P)
