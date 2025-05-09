@@ -14,6 +14,7 @@ if [ ! -d anemoi-core ]; then
     git clone --branch develop https://github.com/metno/anemoi-core.git
     cd anemoi-core
     git remote set-url origin git@github.com:metno/anemoi-core.git
+    git reset --hard da60ee294759f11e07e9b3f813f25e55eb3e4283
     cd ..
 fi
 
@@ -36,9 +37,11 @@ pip install --user --no-deps -e anemoi-utils
 # Clone and install datasets if not already cloned
 if [ ! -d anemoi-datasets ]; then
     echo "Cloning anemoi-datasets from metno"
-    git clone https://github.com/metno/anemoi-datasets.git
+    #git clone https://github.com/metno/anemoi-datasets.git
+    git clone https://github.com/ecmwf/anemoi-datasets.git
     cd anemoi-datasets
     git remote set-url origin git@github.com:metno/anemoi-datasets.git
+    git reset --hard 7fe6eb0a1d816ff409ddc61bacc737af7d2e7de2 # commit chore(main): Release 0.5.21
     cd ..
 fi
 pip install --user --no-deps -e anemoi-datasets
