@@ -3,7 +3,7 @@ defaults:
 - dataloader: native_grid
 - datamodule: single
 - diagnostics: evaluation
-- hardware: example
+- hardware: slurm
 - graph: multi_scale #TODO consider using limited_area & new graph --> then use training.lam.yaml below
 - model: graphtransformer
 - training: default #lam --> implies using scalers/lam.yaml, then add '!limited_area_mask' to training.training_loss.scalers 
@@ -36,53 +36,66 @@ data:
   #- "insolation"
 
   diagnostic: []
-
-  normalizer:
-    default: "mean-std"
-    std: []
-    min-max:
-    max: []
-    none: []
-    #- "h"
-    #- "Uwind_eastward"
-    #- "Vwind_northward" # TODO add normalization later
-    #- "cos_latitude"
-    #- "cos_longitude"
-    #- "sin_latitude"
-    #- "sin_longitude"
-    #- "cos_julian_day"
-    #- "cos_local_time"
-    #- "sin_julian_day"
-    #- "sin_local_time"
-    #- "insolation"
-
-  imputer:
-    #legge til flere variabler her når vi har det
-    default: "none"
-    mean: # TODO fix this!
-    - temperature_0
-    - salinity_0
-    - zeta
-    - Uwind_eastward
-    - Vwind_northward
-    maximum: []
-    minimum: []
     
   processors:
     imputer:
-      _target_: anemoi.models.preprocessing.imputer.InputImputer #ConstantImputer
-      #_convert_: 'all'
-      config: ${data.imputer}
+      #_target_: anemoi.models.preprocessing.imputer.InputImputer #ConstantImputer
+      #config: 
+      #  default: "none"
+      #  minimum: []
+      #  none: []
+      #  mean:  # TODO specify "none" for the other variables?
+      #  - temperature_0
+      #  - salinity_0
+      #  - zeta
+      #  - Uwind_eastward
+      #  - Vwind_northward
+      
+      # TODO: would like to use InputImputer but we get this error:
+      # hydra.errors.InstantiationException: Error in call to target 'anemoi.models.preprocessing.imputer.InputImputer':
+      # TypeError("Statistics <class 'omegaconf.dictconfig.DictConfig'> is optional and not a dictionary")
 
+      _target_: anemoi.models.preprocessing.imputer.ConstantImputer
+      config:
+        default: "none"
+        0:
+        - temperature_0
+        - salinity_0
+        - zeta
+        - Uwind_eastward
+        - Vwind_northward
+  
+    normalizer:
+      _target_: anemoi.models.preprocessing.normalizer.InputNormalizer
+
+      config:
+        default: "mean-std"
+        std: []
+        min-max:
+        max: [] # Data is normalised by dividing by the max value (, so the ‘zero’ point and the proportional distance from this point is retained)
+        none: [] 
+        # TODO add normalization later
+        #- "h" -->max normalization like z?
+        # These should be in none list
+        #- "cos_latitude"
+        #- "cos_longitude"
+        #- "sin_latitude"
+        #- "sin_longitude"
+        #- "cos_julian_day"
+        #- "cos_local_time"
+        #- "sin_julian_day"
+        #- "sin_local_time"
+        #- "insolation"
+      
 dataloader:
   num_workers:
-    training: 2 #TODO set to 8 later
-    validation: 2
-    test: 2
-  batch_size:
-    training: 2
-    validation: 4
-    test: 4
+    training: 8
+    validation: 8
+    test: 8
+  batch_size: 
+    training: 1 # has to be 1 for model-paralell
+    validation: 1
+    test: 1
 
   limit_batches:
     training: null
@@ -135,10 +148,9 @@ hardware:
     graph: graph-17-12-res7.pt # TODO update graph & resolution
     warm_start: null #specific checkpoint to start from, defaults to last.ckpt
 
-  num_gpus_per_node: 1 # TODO change later & use slurm.yaml not example.yaml
-  num_nodes: 1
-  num_gpus_per_model: 1
-  accelerator: auto
+  #num_gpus_per_node: 1 # using slurm.yaml so these two are now read from SLURM env vars set in lumi_jobscript.sh
+  #num_nodes: 1
+  num_gpus_per_model: 4 # TODO: 8 better? This is so-called "model-paralell"
 
 graph:
   overwrite: False
@@ -160,13 +172,24 @@ model:
       normalizer: ['mean-std']
 
 training:
+  # training_loss: # below list is for lam
+  #   scalers: ['*', '!pressure_level', '!general_variable', '!stdev_tendency', '!var_tendency']
+      # variable_groups:
+      # default: []
+      # pl: []
+  
   training_loss:
-    scalers: ['*', '!pressure_level', '!general_variable', '!stdev_tendency', '!var_tendency']
-
-  variable_groups:
-    default: []
-    pl: []
-
+    _target_: anemoi.training.losses.mse.WeightedMSELoss
+    scalars: ['loss_weights_mask'] # which means removing 'variable' thus not using variable_loss_scaling which has hardcoded vars
+  
+  scale_validation_metrics:
+    scalars_to_apply: []
+    metrics:
+      - 'all'
+  #variable_loss_scaling:
+  #  pl: []
+  #  sfc: []
+  
   metrics: []
 
   #TODO rollout is here
