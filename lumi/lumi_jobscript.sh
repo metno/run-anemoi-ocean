@@ -10,7 +10,7 @@
 #SBATCH --job-name=ocean-ai
 #SBATCH --exclusive
 
-CONFIG_NAME=main.yaml 
+CONFIG_NAME=main-core.yaml 
 
 #Should not have to change these
 PROJECT_DIR=/pfs/lustrep3/scratch/$SLURM_JOB_ACCOUNT

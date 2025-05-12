@@ -1,0 +1,208 @@
+defaults:
+- data: zarr
+- dataloader: native_grid
+- datamodule: single
+- diagnostics: evaluation
+- hardware: slurm
+- graph: multi_scale #TODO consider using limited_area & new graph --> then use training.lam.yaml below
+- model: graphtransformer
+- training: default #lam --> implies using scalers/lam.yaml, then add '!limited_area_mask' to training.training_loss.scalers 
+- override hydra/hydra_logging: disabled
+- override hydra/job_logging: disabled
+- _self_
+
+config_validation: False
+
+hydra:  
+  output_subdir: null  
+  run:  
+    dir: .
+
+data:
+  frequency: 3h
+  timestep: 3h
+  forcing:
+  - h
+  - Uwind_eastward
+  - Vwind_northward
+  #- "cos_latitude"
+  #- "cos_longitude"
+  #- "sin_latitude"t 
+  #- "sin_longitude"
+  #- "cos_julian_day"
+  #- "cos_local_time"
+  #- "sin_julian_day"
+  #- "sin_local_time"
+  #- "insolation"
+
+  diagnostic: []
+    
+  processors:
+    imputer:
+      #_target_: anemoi.models.preprocessing.imputer.InputImputer #ConstantImputer
+      #config: 
+      #  default: "none"
+      #  minimum: []
+      #  none: []
+      #  mean:  # TODO specify "none" for the other variables?
+      #  - temperature_0
+      #  - salinity_0
+      #  - zeta
+      #  - Uwind_eastward
+      #  - Vwind_northward
+      
+      # TODO: would like to use InputImputer but we get this error:
+      # hydra.errors.InstantiationException: Error in call to target 'anemoi.models.preprocessing.imputer.InputImputer':
+      # TypeError("Statistics <class 'omegaconf.dictconfig.DictConfig'> is optional and not a dictionary")
+
+      _target_: anemoi.models.preprocessing.imputer.ConstantImputer
+      config:
+        default: "none"
+        0:
+        - temperature_0
+        - salinity_0
+        - zeta
+        - Uwind_eastward
+        - Vwind_northward
+  
+    normalizer:
+      _target_: anemoi.models.preprocessing.normalizer.InputNormalizer
+
+      config:
+        default: "mean-std"
+        std: []
+        min-max:
+        max: [] # Data is normalised by dividing by the max value (, so the ‘zero’ point and the proportional distance from this point is retained)
+        none: [] 
+        # TODO add normalization later
+        #- "h" -->max normalization like z?
+        # These should be in none list
+        #- "cos_latitude"
+        #- "cos_longitude"
+        #- "sin_latitude"
+        #- "sin_longitude"
+        #- "cos_julian_day"
+        #- "cos_local_time"
+        #- "sin_julian_day"
+        #- "sin_local_time"
+        #- "insolation"
+      
+dataloader:
+  num_workers:
+    training: 8
+    validation: 8
+    test: 8
+  batch_size: 
+    training: 1 # has to be 1 for model-paralell
+    validation: 1
+    test: 1
+
+  limit_batches:
+    training: null
+    validation: null
+    test: 20 # TODO used to have null here
+  
+  dataset: ${hardware.paths.data}/${hardware.files.dataset}
+
+  training:
+    dataset: ${dataloader.dataset} 
+    start: 2023-01-01
+    end: 2023-01-03
+    drop: ['vbar_northward', 'ubar_eastward']
+
+  validation_rollout: 1 # TODO change later
+
+  validation:
+    dataset: ${dataloader.dataset}
+    start: 2023-02-01
+    end: 2023-02-28
+    drop: ['vbar_northward', 'ubar_eastward']
+  test:
+    dataset: ${dataloader.dataset}
+    start: 2023-04-01
+    end: 2023-04-03
+    drop: ['vbar_northward', 'ubar_eastward']
+
+diagnostics:
+  plot: 
+    callbacks: []
+  log:
+    mlflow:
+      enabled: True
+      offline: True
+      authentication: True
+      tracking_uri: https://mlflow.ecmwf.int
+      experiment_name: 'metno-fou'
+      run_name: 'hindcast-surface-env-test' #change this
+    wandb: 
+      entity: null
+  print_memory_summary: True
+
+hardware:
+  paths:
+    data: /pfs/lustrep3/scratch/project_465001902/datasets/
+    output: /pfs/lustrep3/scratch/project_465001902/experiments/hindcast-surface-env-test/
+    graph: /pfs/lustrep3/scratch/project_465001902/graphs/
+  files:
+    dataset: norkystv3_hindcast_2023_surface.zarr
+    graph: graph-17-12-res7.pt # TODO update graph & resolution
+    warm_start: null #specific checkpoint to start from, defaults to last.ckpt
+
+  #num_gpus_per_node: 1 # using slurm.yaml so these two are now read from SLURM env vars set in lumi_jobscript.sh
+  #num_nodes: 1
+  num_gpus_per_model: 4 # TODO: 8 better? This is so-called "model-paralell"
+
+graph:
+  overwrite: False
+
+model: 
+  num_channels: 1024
+  trainable_parameters:
+    data: 0
+    hidden: 0
+    data2hidden: 0
+    hidden2data: 0
+    hidden2hidden: 0 # GNN and GraphTransformer Processor only
+  bounding: #These are applied in order
+    - _target_: anemoi.models.layers.bounding.ReluBounding #[0, infinity)
+      variables: [salinity_0]
+    - _target_: anemoi.models.layers.bounding.NormalizedReluBounding
+      variables: [temperature_0]
+      min_val: [-2]
+      normalizer: ['mean-std']
+
+training:
+  # training_loss: # below list is for lam
+  #   scalers: ['*', '!pressure_level', '!general_variable', '!stdev_tendency', '!var_tendency']
+      # variable_groups:
+      # default: []
+      # pl: []
+  
+  training_loss:
+    _target_: anemoi.training.losses.mse.WeightedMSELoss
+    scalars: ['loss_weights_mask'] # which means removing 'variable' thus not using variable_loss_scaling which has hardcoded vars
+  
+  scale_validation_metrics:
+    scalars_to_apply: []
+    metrics:
+      - 'all'
+  #variable_loss_scaling:
+  #  pl: []
+  #  sfc: []
+  
+  metrics: []
+
+  #TODO rollout is here
+
+  run_id: null #path to store the experiment in with output_base as root, null for random name, =fork_run_id to continue training in the same folder.
+  fork_run_id: null #path to the experiment to fork from with output_base as root
+  load_weights_only: False #loads entire model if False, loads only weights if True
+  
+  max_epochs: null
+  max_steps: 150000
+  lr:
+    warmup: 1000 # number of warmup iterations
+    rate: 6.25e-5 #local_lr
+    iterations: ${training.max_steps} # NOTE: When max_epochs < max_steps, scheduler will run for max_steps
+    min: 3e-7 #Not scaled by #GPU
+
