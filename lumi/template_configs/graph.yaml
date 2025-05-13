@@ -2,7 +2,7 @@ defaults:
   - override hydra/job_logging: none
   - override hydra/hydra_logging: none
   - _self_
-  
+
 config_validation: False
 
 nodes:
@@ -12,10 +12,10 @@ nodes:
       dataset: 
         cutout:
           - dataset: /pfs/lustrep3/scratch/project_465001902/datasets/norkystv3-hindcast-3day-surface.zarr #regional
-            #trim_edge: [10, 10, 10, 10]
-            #thinning: 10
+            trim_edge: [10, 10, 10, 10]
+            thinning: 50
           - dataset: /pfs/lustrep3/scratch/project_465001902/datasets/norkystv3-hindcast-3day-surface.zarr #global
-          #  thinning: 10
+            thinning: 50
         adjust: all
         min_distance_km: 1 #test both thinning and min_distance 
     attributes:
@@ -27,7 +27,7 @@ nodes:
           _target_: anemoi.graphs.nodes.attributes.CutOutMask
       area_weight:
         _target_: anemoi.graphs.nodes.attributes.UniformWeights # options: Uniform
-        mask_node_attr_name: cutout_mask
+        #mask_node_attr_name: cutout_mask ---> this should work with anemoi.graphs.nodes.attributes.MaskedPlanarAreaWeights, but not here
         norm: unit-max
   hidden:
     node_builder:
