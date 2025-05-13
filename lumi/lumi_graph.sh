@@ -11,7 +11,8 @@
 #SBATCH --exclusive
 
 CONFIG_NAME=$(pwd -P)/template_configs/graph.yaml
-GRAPH_NAME=graph.pt
+GRAPH_NAME=$(pwd -P)/graph.pt
+
 #Should not have to change these
 PROJECT_DIR=/pfs/lustrep3/scratch/$SLURM_JOB_ACCOUNT
 CONTAINER_SCRIPT=$(pwd -P)/run_pytorch_graph.sh

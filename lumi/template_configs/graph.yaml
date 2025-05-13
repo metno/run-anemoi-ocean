@@ -1,4 +1,9 @@
-
+defaults:
+  - override hydra/job_logging: none
+  - override hydra/hydra_logging: none
+  - _self_
+  
+config_validation: False
 
 nodes:
   data:
@@ -7,18 +12,23 @@ nodes:
       dataset: 
         cutout:
           - dataset: /pfs/lustrep3/scratch/project_465001902/datasets/norkystv3-hindcast-3day-surface.zarr #regional
-            trim_edge: [10, 10, 10, 10]
-            thinning: 10
+            #trim_edge: [10, 10, 10, 10]
+            #thinning: 10
           - dataset: /pfs/lustrep3/scratch/project_465001902/datasets/norkystv3-hindcast-3day-surface.zarr #global
-            thinning: 10
+          #  thinning: 10
         adjust: all
-        min_distance_km: 1 #test both thinning and min_distance
+        min_distance_km: 1 #test both thinning and min_distance 
     attributes:
       cutout_mask:
         _target_: anemoi.graphs.nodes.attributes.CutOutMask
+      boundary_mask:
+        _target_: anemoi.graphs.nodes.attributes.BooleanNot
+        masks:
+          _target_: anemoi.graphs.nodes.attributes.CutOutMask
       area_weight:
-          _target_: anemoi.graphs.nodes.attributes.UniformWeights
-          norm: unit-max
+        _target_: anemoi.graphs.nodes.attributes.UniformWeights # options: Uniform
+        mask_node_attr_name: cutout_mask
+        norm: unit-max
   hidden:
     node_builder:
       _target_: anemoi.graphs.nodes.LimitedAreaTriNodes
@@ -46,7 +56,7 @@ edges:
   edge_builders:
   - _target_: anemoi.graphs.edges.MultiScaleEdges
     x_hops: 1
-    scale_resolutions: ${graph.nodes.hidden.node_builder.resolution}
+    scale_resolutions: ${nodes.hidden.node_builder.resolution}
     source_mask_attr_name: null
     target_mask_attr_name: null
   attributes: ${attributes.edges}
@@ -61,18 +71,6 @@ edges:
   attributes: ${attributes.edges}
 
 attributes:
-  nodes:
-    # Attributes for data nodes
-    cutout_mask:
-      _target_: anemoi.graphs.nodes.attributes.CutOutMask
-    boundary_mask:
-      _target_: anemoi.graphs.nodes.attributes.BooleanNot
-      masks:
-        _target_: anemoi.graphs.nodes.attributes.CutOutMask
-    area_weight:
-      _target_: anemoi.graphs.nodes.attributes.MaskedPlanarAreaWeights # options: Uniform
-      mask_node_attr_name: cutout_mask
-      norm: unit-max
   edges:
     edge_length:
       _target_: anemoi.graphs.edges.attributes.EdgeLength
