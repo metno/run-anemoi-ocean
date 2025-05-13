@@ -1,0 +1,50 @@
+
+
+nodes:
+  data:
+    node_builder:
+      _target_: anemoi.graphs.nodes.AnemoiDatasetNodes
+      dataset: 
+        cutout:
+          - dataset: /pfs/lustrep3/scratch/project_465001902/datasets/norkystv3-hindcast-3day-surface.zarr #regional
+            trim_edge: [10, 10, 10, 10]
+            thinning: 10
+          - dataset: /pfs/lustrep3/scratch/project_465001902/datasets/norkystv3-hindcast-3day-surface.zarr #global
+            thinning: 10
+        adjust: all
+        min_distance_km: 1 #test both thinning and min_distance
+    attributes:
+      cutout_mask:
+        _target_: anemoi.graphs.nodes.attributes.CutOutMask
+      area_weight:
+          _target_: anemoi.graphs.nodes.attributes.UniformWeights
+          norm: unit-max
+  hidden:
+    node_builder:
+      _target_: anemoi.graphs.nodes.LimitedAreaTriNodes
+      resolution: 1 # change this to something much higher
+      reference_node_name: data
+      mask_attr_name: cutout_mask
+  
+edges:
+  # Encoder connections
+  - source_name: data
+    target_name: hidden
+    edge_builders:
+    - _target_: anemoi.graphs.edges.CutOffEdges
+      cutoff_factor: 0.7
+  # Decoder connections
+  - source_name: hidden
+    target_name: data
+    target_mask_attr_name: cutout
+    edge_builders:
+    - _target_: anemoi.graphs.edges.KNNEdges
+      num_nearest_neighbours: 3
+  # Processor connections
+  - source_name: hidden
+    target_name: hidden
+    edge_builders:
+    - _target_: anemoi.graphs.edges.MultiScaleEdges
+      x_hops: 1
+
+
