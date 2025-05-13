@@ -62,7 +62,7 @@ edges:
   edge_builders:
   - _target_: anemoi.graphs.edges.MultiScaleEdges
     x_hops: 1
-    scale_resolutions: ${nodes.hidden.node_builder.resolution}
+    scale_resolutions: 2 # Annoying that it doesn't permit me to write ${nodes.hidden.node_builder.resolution} or similar anywhere
     source_mask_attr_name: null
     target_mask_attr_name: null
   attributes: 
@@ -77,7 +77,7 @@ edges:
   target_name: data
   edge_builders:
   - _target_: anemoi.graphs.edges.KNNEdges # options: KNNEdges, CutOffEdges
-    num_nearest_neighbours: 3 # only for knn method
+    num_nearest_neighbours: 2 # only for knn method
     source_mask_attr_name: null
     target_mask_attr_name: cutout_mask
   attributes: 
