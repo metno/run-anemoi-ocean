@@ -23,17 +23,24 @@ data:
   timestep: 3h
   forcing:
   - h
-  - Uwind_eastward
-  - Vwind_northward
-  #- "cos_latitude"
-  #- "cos_longitude"
-  #- "sin_latitude"t 
-  #- "sin_longitude"
-  #- "cos_julian_day"
-  #- "cos_local_time"
-  #- "sin_julian_day"
-  #- "sin_local_time"
-  #- "insolation"
+  - Pair             
+  - Qair             
+  - Tair   
+  - Uwind
+  - Vwind              
+  - cloud            
+  - cos_julian_day   
+  - cos_latitude     
+  - cos_local_time   
+  - cos_longitude    
+  - f                
+  - insolation       
+  - rain             
+  - river_binary_mask
+  - sin_julian_day   
+  - sin_latitude   
+  - sin_local_time
+  - sin_longitude
 
   diagnostic: []
     
@@ -48,8 +55,6 @@ data:
       #  - temperature_0
       #  - salinity_0
       #  - zeta
-      #  - Uwind_eastward
-      #  - Vwind_northward
       
       # TODO: would like to use InputImputer but we get this error:
       # hydra.errors.InstantiationException: Error in call to target 'anemoi.models.preprocessing.imputer.InputImputer':
@@ -62,8 +67,6 @@ data:
         - temperature_0
         - salinity_0
         - zeta
-        - Uwind_eastward
-        - Vwind_northward
   
     normalizer:
       _target_: anemoi.models.preprocessing.normalizer.InputNormalizer
@@ -72,20 +75,20 @@ data:
         default: "mean-std"
         std: []
         min-max:
-        max: [] # Data is normalised by dividing by the max value (, so the ‘zero’ point and the proportional distance from this point is retained)
-        none: [] 
-        # TODO add normalization later
-        #- "h" -->max normalization like z?
-        # These should be in none list
-        #- "cos_latitude"
-        #- "cos_longitude"
-        #- "sin_latitude"
-        #- "sin_longitude"
-        #- "cos_julian_day"
-        #- "cos_local_time"
-        #- "sin_julian_day"
-        #- "sin_local_time"
-        #- "insolation"
+        max: # Data is normalised by dividing by the max value (, so the ‘zero’ point and the proportional distance from this point is retained)
+        - h
+        none: # TODO any else?
+        - cos_julian_day   
+        - cos_latitude     
+        - cos_local_time   
+        - cos_longitude  
+        - insolation           
+        - sin_julian_day   
+        - sin_latitude   
+        - sin_local_time
+        - sin_longitude
+        - cloud # ?? values between 0,1 already
+        - river_binary_mask # TODO ??
       
 dataloader:
   num_workers:
@@ -102,13 +105,19 @@ dataloader:
     validation: null
     test: 20 # TODO used to have null here
   
-  dataset: ${hardware.paths.data}/${hardware.files.dataset}
+  dataset:
+    join:
+      - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_main}
+        frequency: ${data.frequency}
+      - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_force}
+        frequency: ${data.frequency}
+    adjust: dates
 
   training:
     dataset: ${dataloader.dataset} 
     start: 2023-01-01
     end: 2023-01-03
-    drop: ['vbar_northward', 'ubar_eastward']
+    drop: ['vbar_northward', 'ubar_eastward', 'Uwind_eastward', 'Vwind_northward']
 
   validation_rollout: 1 # TODO change later
 
@@ -116,12 +125,12 @@ dataloader:
     dataset: ${dataloader.dataset}
     start: 2023-02-01
     end: 2023-02-28
-    drop: ['vbar_northward', 'ubar_eastward']
+    drop: ['vbar_northward', 'ubar_eastward', 'Uwind_eastward', 'Vwind_northward']
   test:
     dataset: ${dataloader.dataset}
     start: 2023-04-01
     end: 2023-04-03
-    drop: ['vbar_northward', 'ubar_eastward']
+    drop: ['vbar_northward', 'ubar_eastward', 'Uwind_eastward', 'Vwind_northward']
 
 diagnostics:
   plot: 
@@ -133,7 +142,7 @@ diagnostics:
       authentication: True
       tracking_uri: https://mlflow.ecmwf.int
       experiment_name: 'metno-fou'
-      run_name: 'hindcast-surface-env-test' #change this
+      run_name: 'forcing-test' #change this
     wandb: 
       entity: null
   print_memory_summary: True
@@ -141,10 +150,12 @@ diagnostics:
 hardware:
   paths:
     data: /pfs/lustrep3/scratch/project_465001902/datasets/
-    output: /pfs/lustrep3/scratch/project_465001902/experiments/hindcast-surface-env-test/
+    output: /pfs/lustrep3/scratch/project_465001902/experiments/forcing-test/
     graph: /pfs/lustrep3/scratch/project_465001902/graphs/
   files:
-    dataset: norkystv3_hindcast_2023_surface.zarr
+    dataset:
+      dataset_main: norkystv3_hindcast_2023_surface.zarr
+      dataset_force: forcing_norkystv3_hindcast_2023010100-2023050100.zarr
     graph: graph-17-12-res7.pt # TODO update graph & resolution
     warm_start: null #specific checkpoint to start from, defaults to last.ckpt
 
