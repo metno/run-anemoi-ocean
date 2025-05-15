@@ -108,9 +108,9 @@ dataloader:
   dataset:
     join:
       - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_main}
-        frequency: ${data.frequency}
+        frequency: ${data.frequency} #see https://anemoi.readthedocs.io/projects/datasets/en/latest/howtos/usage/01-interpolate-step-dataset-combination.html#sample-to-lower-frequency
       - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_force}
-        frequency: ${data.frequency}
+        frequency: ${data.frequency} 
     adjust: dates
 
   training:
