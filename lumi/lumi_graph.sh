@@ -6,12 +6,12 @@
 #SBATCH --account=project_465001902
 #SBATCH --partition=dev-g
 #SBATCH --gpus-per-node=1
-#SBATCH --time=00:20:00
+#SBATCH --time=01:00:00
 #SBATCH --job-name=graph_creator
 #SBATCH --exclusive
 
 CONFIG_NAME=$(pwd -P)/template_configs/graph.yaml
-GRAPH_NAME=$(pwd -P)/graph.pt
+GRAPH_NAME=$(pwd -P)/graph_min_distance_08.pt
 
 #Should not have to change these
 PROJECT_DIR=/pfs/lustrep3/scratch/$SLURM_JOB_ACCOUNT
