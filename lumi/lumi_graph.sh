@@ -11,7 +11,7 @@
 #SBATCH --exclusive
 
 CONFIG_NAME=$(pwd -P)/template_configs/graph.yaml
-GRAPH_NAME=$(pwd -P)/graph_min_distance_08.pt
+GRAPH_NAME=$(pwd -P)/trim_edge_10_thinning_4_res_12.pt
 
 #Should not have to change these
 PROJECT_DIR=/pfs/lustrep3/scratch/$SLURM_JOB_ACCOUNT

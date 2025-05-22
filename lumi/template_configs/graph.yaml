@@ -17,7 +17,7 @@ nodes:
           - dataset: /pfs/lustrep3/scratch/project_465001902/datasets/norkystv3-hindcast-3day-surface.zarr #global
             thinning: 4
         adjust: all
-        min_distance_km: 0.8 #test both thinning and min_distance 
+        #min_distance_km: 0.8 #test both thinning and min_distance 
     attributes:
       cutout_mask:
         _target_: anemoi.graphs.nodes.attributes.CutOutMask
@@ -32,7 +32,7 @@ nodes:
   hidden:
     node_builder:
       _target_: anemoi.graphs.nodes.LimitedAreaTriNodes
-      resolution: 10 # change this to something much higher
+      resolution: 12 # change this to something much higher
       reference_node_name: data
       mask_attr_name: cutout_mask
   
@@ -62,7 +62,7 @@ edges:
   edge_builders:
   - _target_: anemoi.graphs.edges.MultiScaleEdges
     x_hops: 1
-    scale_resolutions: 10 # Annoying that it doesn't permit me to write ${nodes.hidden.node_builder.resolution} or similar anywhere
+    scale_resolutions: 12 # Annoying that it doesn't permit me to write ${nodes.hidden.node_builder.resolution} or similar anywhere
     source_mask_attr_name: null
     target_mask_attr_name: null
   attributes: 
@@ -87,4 +87,5 @@ edges:
     edge_dirs:
       _target_: anemoi.graphs.edges.attributes.EdgeDirection
       norm: unit-std
+
 
