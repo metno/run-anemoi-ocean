@@ -4,9 +4,9 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --account=project_465001902
-#SBATCH --partition=dev-g
+#SBATCH --partition=standard-g
 #SBATCH --gpus-per-node=1
-#SBATCH --time=01:00:00
+#SBATCH --time=03:00:00
 #SBATCH --job-name=graph_creator
 #SBATCH --exclusive
 
