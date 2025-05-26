@@ -13,9 +13,9 @@ nodes:
         cutout:
           - dataset: /pfs/lustrep3/scratch/project_465001902/datasets/norkystv3-hindcast-3day-surface.zarr #regional
             trim_edge: 10
-            thinning: 4
+            #thinning: 4
           - dataset: /pfs/lustrep3/scratch/project_465001902/datasets/norkystv3-hindcast-3day-surface.zarr #global
-            thinning: 4
+            #thinning: 4
         adjust: all
         #min_distance_km: 0.8 #test both thinning and min_distance 
     attributes:
@@ -77,7 +77,7 @@ edges:
   target_name: data
   edge_builders:
   - _target_: anemoi.graphs.edges.KNNEdges # options: KNNEdges, CutOffEdges
-    num_nearest_neighbours: 2 # only for knn method
+    num_nearest_neighbours: 3 # only for knn method
     source_mask_attr_name: null
     target_mask_attr_name: cutout_mask
   attributes: 
