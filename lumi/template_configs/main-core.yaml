@@ -4,7 +4,7 @@ defaults:
 - datamodule: single
 - diagnostics: evaluation
 - hardware: slurm
-#- graph: multi_scale --> we are creating the graph in another step (more similar to limited_area.yaml), so only adding minimum needed for config here under 'graph'
+- graph: limited_area # --> we may create the graph in another step, so may uncomment this and only add minimum needed under 'graph'
 - model: graphtransformer
 - training: default 
 - override hydra/hydra_logging: disabled
@@ -28,7 +28,7 @@ data:
   - Tair   
   - Uwind
   - Vwind              
-  #- cloud            
+  - cloud # available from 2017       
   - cos_julian_day   
   - cos_latitude     
   - cos_local_time   
@@ -78,7 +78,7 @@ data:
         min-max:
         max: # Data is normalised by dividing by the max value (, so the ‘zero’ point and the proportional distance from this point is retained)
         - h
-        none: # TODO any else?
+        none:
         - cos_julian_day   
         - cos_latitude     
         - cos_local_time   
@@ -88,15 +88,15 @@ data:
         - sin_latitude   
         - sin_local_time
         - sin_longitude
-        #- cloud # ?? values between 0,1 already
-        - river_binary_mask # TODO ??
+        - cloud # available from 2017
+        - river_binary_mask
         - sea_mask
       
 dataloader:
   num_workers:
-    training: 6
-    validation: 6
-    test: 6
+    training: 2
+    validation: 2
+    test: 2
   batch_size: 
     training: 1 # has to be 1 for model-paralell
     validation: 1
@@ -108,32 +108,51 @@ dataloader:
     test: 20 # TODO used to have null here
   
   dataset:
-    join:
+    cutout:
+    - dataset:
+        join:
+        - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_main}
+          frequency: ${data.frequency}
+        - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_force}
+          frequency: ${data.frequency}
+        adjust: ["start", "end"]
+      trim_edge: 10
+    - join: 
       - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_main}
-        frequency: ${data.frequency} #see https://anemoi.readthedocs.io/projects/datasets/en/latest/howtos/usage/01-interpolate-step-dataset-combination.html#sample-to-lower-frequency
-        thinning: 4
+        frequency: ${data.frequency}
       - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_force}
-        frequency: ${data.frequency} 
-        thinning: 4
-    adjust: dates
+        frequency: ${data.frequency}
+      adjust: ["start", "end"]
+    adjust: all
+    
+    #- dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_main}
+    #  frequency: ${data.frequency} #see https://anemoi.readthedocs.io/projects/datasets/en/latest/howtos/usage/01-interpolate-step-dataset-combination.html#sample-to-lower-frequency
+    #  trim_edge: 10
+    ##- dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_main}
+    #  frequency: ${data.frequency}
+    #cutout:
+    #- dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_force}
+    #  frequency: ${data.frequency}
+    #thinning: 4
+    #adjust: dates
 
   training:
     dataset: ${dataloader.dataset} 
-    start: 2013-01-01
-    end: 2013-01-03
+    start: 2023-01-01
+    end: 2023-12-31
     drop: ['vbar_northward', 'ubar_eastward', 'Uwind_eastward', 'Vwind_northward']
 
   validation_rollout: 1 # TODO change later
 
   validation:
     dataset: ${dataloader.dataset}
-    start: 2013-02-01
-    end: 2013-02-28
+    start: 2024-01-01
+    end: 2024-03-31
     drop: ['vbar_northward', 'ubar_eastward', 'Uwind_eastward', 'Vwind_northward']
   test:
     dataset: ${dataloader.dataset}
-    start: 2013-04-01
-    end: 2013-04-03
+    start: 2024-04-01
+    end: 2024-12-31
     drop: ['vbar_northward', 'ubar_eastward', 'Uwind_eastward', 'Vwind_northward']
 
 diagnostics:
@@ -158,9 +177,9 @@ hardware:
     graph: /pfs/lustrep3/scratch/project_465001902/graphs/
   files:
     dataset:
-      dataset_main: norkystv3_hindcast_2013_surface.zarr
-      dataset_force: norkystv3_forcing_zarr/forcing_norkystv3_hindcast_2013.zarr
-    graph: trim_edge_10_thinning_4_res_10.pt # TODO update graph & resolution
+      dataset_main: norkystv3_hindcast_*_surface.zarr
+      dataset_force: forcing_norkystv3_hindcast_*.zarr
+    graph: trim_edge_10_res_10.pt
     warm_start: null #specific checkpoint to start from, defaults to last.ckpt
 
   #num_gpus_per_node: 1 # using slurm.yaml so these two are now read from SLURM env vars set in lumi_jobscript.sh
@@ -168,13 +187,19 @@ hardware:
   num_gpus_per_model: 4 # TODO: 8 better? This is so-called "model-paralell"
 
 graph:
-  overwrite: False
-
-  data: "data"
-  hidden: "hidden"
+  overwrite: False # only create/re-generate the graph with True
+  nodes:
+    data:
+      hidden:
+        node_builder:
+          resolution: 10
+  attributes:
+    nodes:
+      area_weight:
+        _target_: anemoi.graphs.nodes.attributes.UniformWeights # default is PlanarAreaWeights
 
 model: 
-  num_channels: 1024
+  num_channels: 256 #1024 #TODO: this number dont have to be so large when have few vars, use higher nr when have more layers vars. Test to see if higher than 256 gives added value. Or higher when have less mesh points (remove land)
   trainable_parameters:
     data: 0
     hidden: 0
