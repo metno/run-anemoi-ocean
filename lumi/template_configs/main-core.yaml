@@ -4,7 +4,7 @@ defaults:
 - datamodule: single
 - diagnostics: evaluation
 - hardware: slurm
-- graph: limited_area # --> we may create the graph in another step, so may uncomment this and only add minimum needed under 'graph'
+- graph: limited_area # --> we can create the graph in another step: uncomment this and only add minimum needed under 'graph'
 - model: graphtransformer
 - training: default 
 - override hydra/hydra_logging: disabled
@@ -110,43 +110,96 @@ dataloader:
   dataset:
     cutout:
     - dataset:
-        join:
-        - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_main}
-          frequency: ${data.frequency}
-        - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_force}
-          frequency: ${data.frequency}
+        join: # joining all main and forcing datasets from 2017-2024
+          - concat: 
+            - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_main17}
+            - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_main18}
+            - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_main19}
+            - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_main20}
+            - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_main21}
+            - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_main22}
+            - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_main23}
+            - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_main24}
+            frequency: ${data.frequency}
+          - concat:
+            - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_force17}
+              start: 2017
+              end: 2017
+            - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_force18}
+              start: 2018
+              end: 2018
+            - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_force19}
+              start: 2019
+              end: 2019
+            - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_force20}
+              start: 2020
+              end: 2020
+            - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_force21}
+              start: 2021
+              end: 2021
+            - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_force22}
+              start: 2022
+              end: 2022
+            - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_force23}
+              start: 2023
+              end: 2023
+            - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_force24}
+              start: 2024
+              end: 2024
+            frequency: ${data.frequency}
         adjust: ["start", "end"]
       trim_edge: 10
-    - join: 
-      - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_main}
+    - join:
+      - concat: 
+        - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_main17}
+        - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_main18}
+        - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_main19}
+        - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_main20}
+        - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_main21}
+        - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_main22}
+        - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_main23}
+        - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_main24}
         frequency: ${data.frequency}
-      - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_force}
+      - concat:
+        - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_force17}
+          start: 2017
+          end: 2017
+        - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_force18}
+          start: 2018
+          end: 2018
+        - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_force19}
+          start: 2019
+          end: 2019
+        - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_force20}
+          start: 2020
+          end: 2020
+        - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_force21}
+          start: 2021
+          end: 2021
+        - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_force22}
+          start: 2022
+          end: 2022
+        - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_force23}
+          start: 2023
+          end: 2023
+        - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_force24}
+          start: 2024
+          end: 2024
         frequency: ${data.frequency}
       adjust: ["start", "end"]
     adjust: all
-    
-    #- dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_main}
-    #  frequency: ${data.frequency} #see https://anemoi.readthedocs.io/projects/datasets/en/latest/howtos/usage/01-interpolate-step-dataset-combination.html#sample-to-lower-frequency
-    #  trim_edge: 10
-    ##- dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_main}
-    #  frequency: ${data.frequency}
-    #cutout:
-    #- dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_force}
-    #  frequency: ${data.frequency}
-    #thinning: 4
-    #adjust: dates
 
   training:
     dataset: ${dataloader.dataset} 
-    start: 2023-01-01
-    end: 2023-12-31
+    start: 2017-01-01
+    end: 2023-06-30
     drop: ['vbar_northward', 'ubar_eastward', 'Uwind_eastward', 'Vwind_northward']
 
   validation_rollout: 1 # TODO change later
 
   validation:
     dataset: ${dataloader.dataset}
-    start: 2024-01-01
+    start: 2023-07-01
     end: 2024-03-31
     drop: ['vbar_northward', 'ubar_eastward', 'Uwind_eastward', 'Vwind_northward']
   test:
@@ -177,8 +230,22 @@ hardware:
     graph: /pfs/lustrep3/scratch/project_465001902/graphs/
   files:
     dataset:
-      dataset_main: norkystv3_hindcast_*_surface.zarr
-      dataset_force: forcing_norkystv3_hindcast_*.zarr
+      dataset_main17: norkystv3_hindcast_2017_surface.zarr
+      dataset_main18: norkystv3_hindcast_2018_surface.zarr
+      dataset_main19: norkystv3_hindcast_2019_surface.zarr
+      dataset_main20: norkystv3_hindcast_2020_surface.zarr
+      dataset_main21: norkystv3_hindcast_2021_surface.zarr
+      dataset_main22: norkystv3_hindcast_2022_surface.zarr
+      dataset_main23: norkystv3_hindcast_2023_surface.zarr
+      dataset_main24: norkystv3_hindcast_2024_surface.zarr
+      dataset_force17: norkystv3_forcing_zarr/forcing_norkystv3_hindcast_2017.zarr
+      dataset_force18: norkystv3_forcing_zarr/forcing_norkystv3_hindcast_2018.zarr
+      dataset_force19: norkystv3_forcing_zarr/forcing_norkystv3_hindcast_2019.zarr
+      dataset_force20: norkystv3_forcing_zarr/forcing_norkystv3_hindcast_2020.zarr
+      dataset_force21: norkystv3_forcing_zarr/forcing_norkystv3_hindcast_2021.zarr
+      dataset_force22: norkystv3_forcing_zarr/forcing_norkystv3_hindcast_2022.zarr
+      dataset_force23: norkystv3_forcing_zarr/forcing_norkystv3_hindcast_2023.zarr
+      dataset_force24: norkystv3_forcing_zarr/forcing_norkystv3_hindcast_2024.zarr
     graph: trim_edge_10_res_10.pt
     warm_start: null #specific checkpoint to start from, defaults to last.ckpt
 
