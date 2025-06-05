@@ -10,11 +10,11 @@ export PATH=$PATH:$VIRTUAL_ENV/bin
 
 # Clone anemoi-core if not already cloned
 if [ ! -d anemoi-core ]; then
-    echo "Cloning anemoi-core from metno"
-    git clone --branch develop https://github.com/metno/anemoi-core.git
+    echo "Cloning anemoi-core from ecmwf"
+    git clone --branch main https://github.com/ecmwf/anemoi-core.git
     cd anemoi-core
-    git remote set-url origin git@github.com:metno/anemoi-core.git
-    git reset --hard da60ee294759f11e07e9b3f813f25e55eb3e4283
+    git remote set-url origin git@github.com:ecmwf/anemoi-core.git
+    git reset --hard 26f2d92d77fe341459fde722f2e9b965751c47ce #chore(main): Release models 0.7.0 (#324)
     cd ..
 fi
 
