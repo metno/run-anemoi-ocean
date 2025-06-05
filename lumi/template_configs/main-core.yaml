@@ -6,7 +6,7 @@ defaults:
 - hardware: slurm
 - graph: limited_area # --> we can create the graph in another step: uncomment this and only add minimum needed under 'graph'
 - model: graphtransformer
-- training: default 
+- training: lam 
 - override hydra/hydra_logging: disabled
 - override hydra/job_logging: disabled
 - _self_
@@ -28,7 +28,7 @@ data:
   - Tair   
   - Uwind
   - Vwind              
-  #- cloud # available from 2017       
+  - cloud # available from 2017       
   - cos_julian_day   
   - cos_latitude     
   - cos_local_time   
@@ -88,7 +88,7 @@ data:
         - sin_latitude   
         - sin_local_time
         - sin_longitude
-        #- cloud # available from 2017
+        - cloud # available from 2017
         - river_binary_mask
         - sea_mask
       
@@ -105,162 +105,62 @@ dataloader:
   limit_batches:
     training: null
     validation: null
-    test: 20 # TODO used to have null here
+    test: 20 
   
   dataset:
     cutout:
     - dataset:
-        join: # joining all main and forcing datasets from 2017-2024
+        join: # joining all main and forcing datasets from 2023-2024
           - concat: 
-            - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_main12}
-            - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_main13}
-            - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_main14}
-            - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_main15}
-            - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_main16}
-            - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_main17}
-            - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_main18}
-            - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_main19}
-            - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_main20}
-            - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_main21}
-            - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_main22}
             - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_main23}
             - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_main24}
             frequency: ${data.frequency}
           - concat:
-            - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_force12}
-              start: 2012
-              end: 2012
-            - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_force13}
-              start: 2013
-              end: 2013
-            - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_force14}
-              start: 2014
-              end: 2014
-            - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_force15}
-              start: 2015
-              end: 2015
-            - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_force16}
-              start: 2016
-              end: 2016
-            - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_force17}
-              start: 2017
-              end: 2017
-              drop: cloud
-            - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_force18}
-              start: 2018
-              end: 2018
-              drop: cloud
-            - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_force19}
-              start: 2019
-              end: 2019
-              drop: cloud
-            - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_force20}
-              start: 2020
-              end: 2020
-              drop: cloud
-            - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_force21}
-              start: 2021
-              end: 2021
-              drop: cloud
-            - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_force22}
-              start: 2022
-              end: 2022
-              drop: cloud
             - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_force23}
               start: 2023
               end: 2023
-              drop: cloud
             - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_force24}
               start: 2024
               end: 2024
-              drop: cloud
             frequency: ${data.frequency}
         adjust: ["start", "end"]
       trim_edge: 10
     - join:
       - concat: 
-        - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_main12}
-        - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_main13}
-        - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_main14}
-        - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_main15}
-        - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_main16}
-        - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_main17}
-        - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_main18}
-        - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_main19}
-        - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_main20}
-        - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_main21}
-        - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_main22}
         - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_main23}
         - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_main24}
         frequency: ${data.frequency}
       - concat:
-        - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_force12}
-          start: 2012
-          end: 2012
-        - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_force13}
-          start: 2013
-          end: 2013
-        - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_force14}
-          start: 2014
-          end: 2014
-        - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_force15}
-          start: 2015
-          end: 2015
-        - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_force16}
-          start: 2016
-          end: 2016
-        - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_force17}
-          start: 2017
-          end: 2017
-          drop: cloud
-        - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_force18}
-          start: 2018
-          end: 2018
-          drop: cloud
-        - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_force19}
-          start: 2019
-          end: 2019
-          drop: cloud
-        - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_force20}
-          start: 2020
-          end: 2020
-          drop: cloud
-        - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_force21}
-          start: 2021
-          end: 2021
-          drop: cloud
-        - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_force22}
-          start: 2022
-          end: 2022
-          drop: cloud
         - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_force23}
           start: 2023
           end: 2023
-          drop: cloud
         - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_force24}
           start: 2024
           end: 2024
-          drop: cloud
         frequency: ${data.frequency}
       adjust: ["start", "end"]
     adjust: all
+  grid_indices: # suggested by lam.yaml, gives correct indices
+    _target_: anemoi.training.data.grid_indices.MaskedGrid
+    nodes_name: data
+    node_attribute_name: indices_connected_nodes
 
   training:
     dataset: ${dataloader.dataset} 
-    start: 2012-01-01
-    end: 2022-06-30
+    start: 2023-01-01
+    end: 2023-12-31
     drop: ['vbar_northward', 'ubar_eastward', 'Uwind_eastward', 'Vwind_northward']
 
   validation_rollout: 1 # TODO change later
 
   validation:
     dataset: ${dataloader.dataset}
-    start: 2022-07-01
-    end: 2023-09-30
+    start: 2024-01-01
+    end: 2024-02-29
     drop: ['vbar_northward', 'ubar_eastward', 'Uwind_eastward', 'Vwind_northward']
   test:
     dataset: ${dataloader.dataset}
-    start: 2023-10-01
+    start: 2024-03-01
     end: 2024-12-31
     drop: ['vbar_northward', 'ubar_eastward', 'Uwind_eastward', 'Vwind_northward']
 
@@ -274,7 +174,7 @@ diagnostics:
       authentication: True
       tracking_uri: https://mlflow.ecmwf.int
       experiment_name: 'metno-fou'
-      run_name: 'lam-graph-test' #change this
+      run_name: 'lam-gridind-res10-2017-24-cloud' #change this
     wandb: 
       entity: null
   print_memory_summary: True
@@ -282,34 +182,12 @@ diagnostics:
 hardware:
   paths:
     data: /pfs/lustrep3/scratch/project_465001902/datasets/
-    output: /pfs/lustrep3/scratch/project_465001902/experiments/lam-graph-test/
+    output: /pfs/lustrep3/scratch/project_465001902/experiments/lam-gridind-res10-2017-24-cloud/
     graph: /pfs/lustrep3/scratch/project_465001902/graphs/
   files:
     dataset:
-      dataset_main12: norkystv3_hindcast_2012_surface.zarr
-      dataset_main13: norkystv3_hindcast_2013_surface.zarr
-      dataset_main14: norkystv3_hindcast_2014_surface.zarr
-      dataset_main15: norkystv3_hindcast_2015_surface.zarr
-      dataset_main16: norkystv3_hindcast_2016_surface.zarr
-      dataset_main17: norkystv3_hindcast_2017_surface.zarr
-      dataset_main18: norkystv3_hindcast_2018_surface.zarr
-      dataset_main19: norkystv3_hindcast_2019_surface.zarr
-      dataset_main20: norkystv3_hindcast_2020_surface.zarr
-      dataset_main21: norkystv3_hindcast_2021_surface.zarr
-      dataset_main22: norkystv3_hindcast_2022_surface.zarr
       dataset_main23: norkystv3_hindcast_2023_surface.zarr
       dataset_main24: norkystv3_hindcast_2024_surface.zarr
-      dataset_force12: norkystv3_forcing_zarr/forcing_norkystv3_hindcast_2012.zarr
-      dataset_force13: norkystv3_forcing_zarr/forcing_norkystv3_hindcast_2013.zarr
-      dataset_force14: norkystv3_forcing_zarr/forcing_norkystv3_hindcast_2014.zarr
-      dataset_force15: norkystv3_forcing_zarr/forcing_norkystv3_hindcast_2015.zarr
-      dataset_force16: norkystv3_forcing_zarr/forcing_norkystv3_hindcast_2016.zarr
-      dataset_force17: norkystv3_forcing_zarr/forcing_norkystv3_hindcast_2017.zarr
-      dataset_force18: norkystv3_forcing_zarr/forcing_norkystv3_hindcast_2018.zarr
-      dataset_force19: norkystv3_forcing_zarr/forcing_norkystv3_hindcast_2019.zarr
-      dataset_force20: norkystv3_forcing_zarr/forcing_norkystv3_hindcast_2020.zarr
-      dataset_force21: norkystv3_forcing_zarr/forcing_norkystv3_hindcast_2021.zarr
-      dataset_force22: norkystv3_forcing_zarr/forcing_norkystv3_hindcast_2022.zarr
       dataset_force23: norkystv3_forcing_zarr/forcing_norkystv3_hindcast_2023.zarr
       dataset_force24: norkystv3_forcing_zarr/forcing_norkystv3_hindcast_2024.zarr
     graph: trim_edge_10_res_10.pt
@@ -317,7 +195,7 @@ hardware:
 
   #num_gpus_per_node: 1 # using slurm.yaml so these two are now read from SLURM env vars set in lumi_jobscript.sh
   #num_nodes: 1
-  num_gpus_per_model: 4 # TODO: 8 better? This is so-called "model-paralell"
+  num_gpus_per_model: 8 # TODO: 8 better? This is so-called "model-paralell"
 
 graph:
   overwrite: False # only create/re-generate the graph with True
@@ -346,29 +224,31 @@ model:
       variables: [temperature_0]
       min_val: [-2]
       normalizer: ['mean-std']
+  output_mask: # suggested by lam.yaml
+    _target_: anemoi.training.utils.masks.Boolean1DMask
+    nodes_name: ${graph.data}
+    attribute_name: cutout_mask
 
 training:
   # This section is to avoid using variable_loss_scaling 
   training_loss:
-    _target_: anemoi.training.losses.mse.WeightedMSELoss
-    scalars: ['loss_weights_mask'] # which means removing 'variable' thus not using variable_loss_scaling which has hardcoded vars under "pl" and "scf"
-  
-  scale_validation_metrics:
-    scalars_to_apply: []
-    metrics:
-      - 'all'
+    # loss class to initialise
+    _target_: anemoi.training.losses.MSELoss
+    # Scalers to include in loss calculation
+    scalers: ['general_variable', 'nan_mask_weights', 'node_weights']
+    ignore_nans: False
   
   metrics: # this used to list only a few variables
   - 'all'  
 
   #TODO rollout is here
 
-  run_id: null #path to store the experiment in with output_base as root, null for random name, =fork_run_id to continue training in the same folder.
+  run_id: null # checkpoint id for the experiment in with output_base as root, null for random name, =fork_run_id to continue training in the same folder.
   fork_run_id: null #path to the experiment to fork from with output_base as root
   load_weights_only: False #loads entire model if False, loads only weights if True
   
   max_epochs: null
-  max_steps: 150000
+  max_steps: 50000
   lr:
     warmup: 1000 # number of warmup iterations
     rate: 6.25e-5 #local_lr
