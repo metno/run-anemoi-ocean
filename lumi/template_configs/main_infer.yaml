@@ -2,111 +2,103 @@ defaults:
   - override hydra/job_logging: none
   - override hydra/hydra_logging: none
   - _self_
-  
-start_date: 2024-03-01T00:00:00 # Start of dataset -> start time = start_date + multistep * timestep
-end_date: 2024-03-01T03:00:00
 
-checkpoint_path: ${hardware.paths.output}/checkpoint/77c1cdd9-18a3-47c0-b6bd-abdb6310d1cb/inference-last.ckpt
+start_date: 2024-03-02T00:00:00 # Start of dataset -> start time = start_date + multistep * timestep
+end_date: 2024-03-02T06:00:00
 
-leadtimes: 12 #Number of leadtimes (rollout) for each prediction time
-timestep: 1h #Time step of the model
-frequency: 1h #Frequency of the dataset
+checkpoints:
+  forecaster:
+    checkpoint_path: /pfs/lustrep3/scratch/project_465001902/experiments/lam-gridind-res10-2024-cloud/checkpoint/c544a0337a0644b8a0c33a92f6d007d5/inference-last.ckpt
+    leadtimes: 6
+    #static_forcings_dataset: null
+    #switch_graph: null
+
+timestep: 3h #Time step of the model
+frequency: 3h #Frequency of the dataset
 
 deterministic: True
 
-run_name: template_run
+run_name: infer-hindcast-2024
 
-dataset: 
-  dataset: ${hardware.paths.data}/${hardware.files.dataset}
-    #trimedge branch
-  mask_from_dataset:
-    dataset: /pfs/lustrep3/scratch/project_465001902/datasets/mask_norkyst_2024.zarr
-    field: land_binary_mask_0
+dataset_main23: /pfs/lustrep3/scratch/project_465001902/datasets/norkystv3_hindcast_2023_surface.zarr
+dataset_main24: /pfs/lustrep3/scratch/project_465001902/datasets/norkystv3_hindcast_2024_surface.zarr
+dataset_force23: /pfs/lustrep3/scratch/project_465001902/datasets/norkystv3_forcing_zarr/forcing_norkystv3_hindcast_2023.zarr
+dataset_force24: /pfs/lustrep3/scratch/project_465001902/datasets/norkystv3_forcing_zarr/forcing_norkystv3_hindcast_2024.zarr
 
-# If the user wants to release GPU cache and memory
-# This option releases unused cached/memory used by torch
-release_cache: False
+dataset:
+  cutout:
+  - dataset:
+      join: # joining all main and forcing datasets from 2023-2024
+        - concat: 
+          - dataset: ${dataset_main23}
+          - dataset: ${dataset_main24}
+          frequency: ${frequency}
+        - concat:
+          - dataset: ${dataset_force23}
+            start: 2023
+            end: 2023
+          - dataset: ${dataset_force24}
+            start: 2024
+            end: 2024
+          frequency: ${frequency}
+      adjust: ["start", "end"]
+    trim_edge: 10
+  - join:
+    - concat: 
+      - dataset: ${dataset_main23}
+      - dataset: ${dataset_main24}
+      frequency: ${frequency}
+    - concat:
+      - dataset: ${dataset_force23}
+        start: 2023
+        end: 2023
+      - dataset: ${dataset_force24}
+        start: 2024
+        end: 2024
+      frequency: ${frequency}
+    adjust: ["start", "end"]
+  adjust: all
+
+
+  # Add this if masking land
+  #mask_from_dataset:
+  #  dataset: /pfs/lustrep3/scratch/project_465001902/datasets/mask_norkyst_2024.zarr
+  #  field: land_binary_mask_0
 
 dataloader:
-  batch_size: 1
-  prefetch_factor: 2
-  num_workers: 1
-  pin_memory: True
-
-  read_group_size: 1 #Do not change this, not implemented properly
-
-  predict:
-    dataset: ${dataset}
-    start: ${start_date}
-    end: ${end_date}
-    frequency: ${frequency}
-#    reorder: ${reorder}
-
   datamodule:
-    _target_: anemoi.training.data.dataset.NativeGridDataset #anemoi.training.data.dataset.ZipDataset
+    _target_: bris.data.dataset.NativeGridDataset #anemoi.training.data.dataset.ZipDataset
     _convert_: all
+  
+  grid_indices: # suggested by lam.yaml, gives correct indices
+    _target_: anemoi.training.data.grid_indices.MaskedGrid
+    nodes_name: data
+    node_attribute_name: indices_connected_nodes
+
+workdir: /pfs/lustrep3/scratch/project_465001902/experiments/lam-gridind-res10-2024-cloud/
 
 hardware:
-  paths:
-    data: /pfs/lustrep3/scratch/project_465001902/datasets/ 
-    workdir: ${hardware.paths.output} 
-    #workdir: #Required verif filer (temp write dir
-    output: /pfs/lustrep3/scratch/project_465001902/experiments/exp-name/ #change this
-  files:
-    dataset: prepro_norkyst_tests/norkyst800_his_zdepth_2024_m00_AN_ml.zarr
-
   num_gpus_per_node: 8
   num_gpus_per_model: 4
   num_nodes: 1
 
 model:
-  _target_: bris.model.BrisPredictor 
+  _target_: bris.model.brispredictor.BrisPredictor
   _convert_: all
 
 # Outputs to write. 
 routing:
   - decoder_index: 0
-    domain: 0
+    domain_index: 0
     outputs:
       #Forecast timeseries as netcdf
       - netcdf: 
-          filename_pattern: ${hardware.paths.output}/predictions/template_pred_%Y%m%dT%HZ.nc
-          variables: [u_eastward_1,v_northward_1,temperature_1,salinity_1,zeta] # Leave this empty to include all variables (?)
-          mask_file: /pfs/lustrep3/scratch/project_465001902/datasets/surface_mask.nc
-          mask_field: land_binary_mask
-          #extra_variables:  [] # Extra outputs (for instance windspeed is not an output from the model and is calculated for each prediction)
-      #Create files for point verification - these can be used with the verif command line tool
-      #- verif: 
-      #    filename: ${hardware.paths.output}/verif/2t/template.nc
-      #    variable: 2t
-      #    thresholds: [0, 10, 20]
-      #    quantile_levels: [0.1, 0.9]
-      #    units: degC
-      #    elev_gradient: -0.0065 #Gradient to use for height correction when interpolating forecast to station locations
-      #    obs_sources: # Source of point observations. 
-      #      - verif:
-      #          filename: /pfs/lustrep3/scratch/project_465001383/aifs/verification/nordic/6h/202206_202305/t2m/newref_n320_2.5k_7p10_r4.nc 
-      #- verif:
-      #    filename: ${hardware.paths.output}/verif/10si/template.nc
-      #    variable: 10si
-      #    thresholds: [0, 10, 20]
-      #    quantile_levels: [0.1, 0.9]
-      #    units: m/s
-      #    obs_sources:
-      #      - verif:
-      #          filename: /pfs/lustrep3/scratch/project_465001383/aifs/verification/nordic/6h/202206_202305/ws10m/newref_n320_2.5k_7p10_r4.nc
-      #- verif:
-      #    filename: ${hardware.paths.output}/verif/msl/template.nc
-      #    variable: msl
-      #    units: hPa
-      #    obs_sources:
-      #      - verif:
-      #          filename: /pfs/lustrep3/scratch/project_465001383/aifs/verification/nordic/6h/202206_202305/mslp/newref_n320_2.5k_7p10_r4.nc
-      #- verif:
-      #    filename: ${hardware.paths.output}/verif/tp/template.nc
-      #    variable: tp
-      #    units: kg/m^2
-      #    obs_sources:
-      #      - verif:
-      #          filename: /pfs/lustrep3/scratch/project_465001383/aifs/verification/nordic/6h/202206_202305/precip6h/newref_n320_2.5k_7p10_r4.nc
-
+          filename_pattern: /pfs/lustrep3/scratch/project_465001902/experiments/lam-gridind-res10-2024-cloud/inference/norkystv3_hindcast_2024_surface_pred_%Y%m%dT%HZ.nc
+          # TODO: may run inference output in same dir always (set above)...
+          variables: [u_eastward_0,v_northward_0,temperature_0,salinity_0,zeta] # Leave this empty to include all variables (?)
+          # TODO: may do something like this for absolute current speed
+          #extra_variables: [ws] # Extra outputs (for instance windspeed is not an output from the model and is calculated for each prediction)
+          
+          # Add this if land values have been masked out:
+          #mask_file: /pfs/lustrep3/scratch/project_465001902/datasets/surface_mask.nc
+          #mask_field: land_binary_mask

@@ -4,9 +4,9 @@ defaults:
 - datamodule: single
 - diagnostics: evaluation
 - hardware: slurm
-- graph: multi_scale #TODO consider using limited_area & new graph --> then use training.lam.yaml below
+- graph: limited_area # --> we can create the graph in another step: uncomment this and only add minimum needed under 'graph'
 - model: graphtransformer
-- training: default #lam --> implies using scalers/lam.yaml, then add '!limited_area_mask' to training.training_loss.scalers 
+- training: lam 
 - override hydra/hydra_logging: disabled
 - override hydra/job_logging: disabled
 - _self_
@@ -28,7 +28,7 @@ data:
   - Tair   
   - Uwind
   - Vwind              
-  - cloud            
+  - cloud # available from 2017       
   - cos_julian_day   
   - cos_latitude     
   - cos_local_time   
@@ -41,6 +41,7 @@ data:
   - sin_latitude   
   - sin_local_time
   - sin_longitude
+  - sea_mask
 
   diagnostic: []
     
@@ -77,7 +78,7 @@ data:
         min-max:
         max: # Data is normalised by dividing by the max value (, so the ‘zero’ point and the proportional distance from this point is retained)
         - h
-        none: # TODO any else?
+        none:
         - cos_julian_day   
         - cos_latitude     
         - cos_local_time   
@@ -87,14 +88,15 @@ data:
         - sin_latitude   
         - sin_local_time
         - sin_longitude
-        - cloud # ?? values between 0,1 already
-        - river_binary_mask # TODO ??
+        - cloud # available from 2017
+        - river_binary_mask
+        - sea_mask
       
 dataloader:
   num_workers:
-    training: 8
-    validation: 8
-    test: 8
+    training: 2
+    validation: 2
+    test: 2
   batch_size: 
     training: 1 # has to be 1 for model-paralell
     validation: 1
@@ -103,33 +105,63 @@ dataloader:
   limit_batches:
     training: null
     validation: null
-    test: 20 # TODO used to have null here
+    test: 20 
   
   dataset:
-    join:
-      - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_main}
-        frequency: ${data.frequency} #see https://anemoi.readthedocs.io/projects/datasets/en/latest/howtos/usage/01-interpolate-step-dataset-combination.html#sample-to-lower-frequency
-      - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_force}
-        frequency: ${data.frequency} 
-    adjust: dates
+    cutout:
+    - dataset:
+        join: # joining all main and forcing datasets from 2023-2024
+          - concat: 
+            - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_main23}
+            - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_main24}
+            frequency: ${data.frequency}
+          - concat:
+            - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_force23}
+              start: 2023
+              end: 2023
+            - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_force24}
+              start: 2024
+              end: 2024
+            frequency: ${data.frequency}
+        adjust: ["start", "end"]
+      trim_edge: 10
+    - join:
+      - concat: 
+        - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_main23}
+        - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_main24}
+        frequency: ${data.frequency}
+      - concat:
+        - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_force23}
+          start: 2023
+          end: 2023
+        - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_force24}
+          start: 2024
+          end: 2024
+        frequency: ${data.frequency}
+      adjust: ["start", "end"]
+    adjust: all
+  grid_indices: # suggested by lam.yaml, gives correct indices
+    _target_: anemoi.training.data.grid_indices.MaskedGrid
+    nodes_name: data
+    node_attribute_name: indices_connected_nodes
 
   training:
     dataset: ${dataloader.dataset} 
     start: 2023-01-01
-    end: 2023-01-03
+    end: 2023-12-31
     drop: ['vbar_northward', 'ubar_eastward', 'Uwind_eastward', 'Vwind_northward']
 
   validation_rollout: 1 # TODO change later
 
   validation:
     dataset: ${dataloader.dataset}
-    start: 2023-02-01
-    end: 2023-02-28
+    start: 2024-01-01
+    end: 2024-02-29
     drop: ['vbar_northward', 'ubar_eastward', 'Uwind_eastward', 'Vwind_northward']
   test:
     dataset: ${dataloader.dataset}
-    start: 2023-04-01
-    end: 2023-04-03
+    start: 2024-03-01
+    end: 2024-12-31
     drop: ['vbar_northward', 'ubar_eastward', 'Uwind_eastward', 'Vwind_northward']
 
 diagnostics:
@@ -142,7 +174,7 @@ diagnostics:
       authentication: True
       tracking_uri: https://mlflow.ecmwf.int
       experiment_name: 'metno-fou'
-      run_name: 'forcing-test' #change this
+      run_name: 'lam-gridind-res10-2017-24-cloud' #change this
     wandb: 
       entity: null
   print_memory_summary: True
@@ -150,24 +182,35 @@ diagnostics:
 hardware:
   paths:
     data: /pfs/lustrep3/scratch/project_465001902/datasets/
-    output: /pfs/lustrep3/scratch/project_465001902/experiments/forcing-test/
+    output: /pfs/lustrep3/scratch/project_465001902/experiments/lam-gridind-res10-2017-24-cloud/
     graph: /pfs/lustrep3/scratch/project_465001902/graphs/
   files:
     dataset:
-      dataset_main: norkystv3_hindcast_2023_surface.zarr
-      dataset_force: forcing_norkystv3_hindcast_2023010100-2023050100.zarr
-    graph: graph-17-12-res7.pt # TODO update graph & resolution
+      dataset_main23: norkystv3_hindcast_2023_surface.zarr
+      dataset_main24: norkystv3_hindcast_2024_surface.zarr
+      dataset_force23: norkystv3_forcing_zarr/forcing_norkystv3_hindcast_2023.zarr
+      dataset_force24: norkystv3_forcing_zarr/forcing_norkystv3_hindcast_2024.zarr
+    graph: trim_edge_10_res_10.pt
     warm_start: null #specific checkpoint to start from, defaults to last.ckpt
 
   #num_gpus_per_node: 1 # using slurm.yaml so these two are now read from SLURM env vars set in lumi_jobscript.sh
   #num_nodes: 1
-  num_gpus_per_model: 4 # TODO: 8 better? This is so-called "model-paralell"
+  num_gpus_per_model: 8 # TODO: 8 better? This is so-called "model-paralell"
 
 graph:
-  overwrite: False
+  overwrite: False # only create/re-generate the graph with True
+  nodes:
+    data:
+      hidden:
+        node_builder:
+          resolution: 10
+  attributes:
+    nodes:
+      area_weight:
+        _target_: anemoi.graphs.nodes.attributes.UniformWeights # default is PlanarAreaWeights
 
 model: 
-  num_channels: 1024
+  num_channels: 256 #1024 #TODO: this number dont have to be so large when have few vars, use higher nr when have more layers vars. Test to see if higher than 256 gives added value. Or higher when have less mesh points (remove land)
   trainable_parameters:
     data: 0
     hidden: 0
@@ -181,36 +224,31 @@ model:
       variables: [temperature_0]
       min_val: [-2]
       normalizer: ['mean-std']
+  output_mask: # suggested by lam.yaml
+    _target_: anemoi.training.utils.masks.Boolean1DMask
+    nodes_name: ${graph.data}
+    attribute_name: cutout_mask
 
 training:
-  # training_loss: # below list is for lam
-  #   scalers: ['*', '!pressure_level', '!general_variable', '!stdev_tendency', '!var_tendency']
-      # variable_groups:
-      # default: []
-      # pl: []
-  
+  # This section is to avoid using variable_loss_scaling 
   training_loss:
-    _target_: anemoi.training.losses.mse.WeightedMSELoss
-    scalars: ['loss_weights_mask'] # which means removing 'variable' thus not using variable_loss_scaling which has hardcoded vars
+    # loss class to initialise
+    _target_: anemoi.training.losses.MSELoss
+    # Scalers to include in loss calculation
+    scalers: ['general_variable', 'nan_mask_weights', 'node_weights']
+    ignore_nans: False
   
-  scale_validation_metrics:
-    scalars_to_apply: []
-    metrics:
-      - 'all'
-  #variable_loss_scaling:
-  #  pl: []
-  #  sfc: []
-  
-  metrics: []
+  metrics: # this used to list only a few variables
+  - 'all'  
 
   #TODO rollout is here
 
-  run_id: null #path to store the experiment in with output_base as root, null for random name, =fork_run_id to continue training in the same folder.
+  run_id: null # checkpoint id for the experiment in with output_base as root, null for random name, =fork_run_id to continue training in the same folder.
   fork_run_id: null #path to the experiment to fork from with output_base as root
   load_weights_only: False #loads entire model if False, loads only weights if True
   
   max_epochs: null
-  max_steps: 150000
+  max_steps: 50000
   lr:
     warmup: 1000 # number of warmup iterations
     rate: 6.25e-5 #local_lr
