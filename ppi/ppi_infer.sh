@@ -4,7 +4,7 @@
 #$ -S /bin/bash
 #$ -l h_data=10G
 #$ -l h_rss=10G
-#$ -l h_rt=00:10:00
+#$ -l h_rt=01:00:00
 #$ -q gpu-r8.q
 #$ -l h=gpu-03.ppi.met.no
 #$ -o /lustre/storeB/project/fou/hi/foccus/mateuszm/run-anemoi-ocean/ppi/output/
