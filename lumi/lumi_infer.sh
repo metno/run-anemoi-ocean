@@ -6,11 +6,12 @@
 #SBATCH --account=project_465001902
 #SBATCH --partition=dev-g
 #SBATCH --gpus-per-node=8
-#SBATCH --time=00:20:00
+#SBATCH --time=00:30:00
 #SBATCH --job-name=infer-ocean
 #SBATCH --exclusive
 
-CONFIG_NAME=$(pwd -P)/main_infer.yaml
+CONFIG_NAME=$(pwd -P)/main-anemoi-infer.yaml
+#CONFIG_NAME=$(pwd -P)/main_infer.yaml
 
 #Should not have to change these
 PROJECT_DIR=/pfs/lustrep3/scratch/$SLURM_JOB_ACCOUNT
@@ -19,7 +20,8 @@ chmod 770 ${CONTAINER_SCRIPT}
 CONFIG_DIR=$(pwd -P)
 # NB! in order to avoid NCCL timeouts it is adviced to use 
 # pytorch 2.3.1 or above to have NCCL 2.18.3 version
-CONTAINER=$PROJECT_DIR/container/ocean-ai-infer-pytorch-2.3.1-rocm-6.0.3-py-3.11.5-v0.0.sif
+CONTAINER=$PROJECT_DIR/container/ocean-ai-pytorch-2.3.1-rocm-6.0.3-py-3.11.5-v0.0.sif
+#CONTAINER=$PROJECT_DIR/container/ocean-ai-infer-pytorch-2.3.1-rocm-6.0.3-py-3.11.5-v0.0.sif
 VENV=$(pwd -P)/.venv
 export VIRTUAL_ENV=$VENV
 
