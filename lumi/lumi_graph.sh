@@ -4,14 +4,14 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --account=project_465001902
-#SBATCH --partition=dev-g
+#SBATCH --partition=standard-g
 #SBATCH --gpus-per-node=1
-#SBATCH --time=00:20:00
+#SBATCH --time=05:00:00
 #SBATCH --job-name=graph_creator
 #SBATCH --exclusive
 
 CONFIG_NAME=$(pwd -P)/template_configs/graph.yaml
-GRAPH_NAME=$(pwd -P)/graph.pt
+GRAPH_NAME=$(pwd -P)/trim_edge_10_res_12.pt
 
 #Should not have to change these
 PROJECT_DIR=/pfs/lustrep3/scratch/$SLURM_JOB_ACCOUNT

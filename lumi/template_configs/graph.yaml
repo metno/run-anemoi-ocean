@@ -12,12 +12,12 @@ nodes:
       dataset: 
         cutout:
           - dataset: /pfs/lustrep3/scratch/project_465001902/datasets/norkystv3-hindcast-3day-surface.zarr #regional
-            trim_edge: [10, 10, 10, 10]
-            thinning: 50
+            trim_edge: 10
+            #thinning: 4
           - dataset: /pfs/lustrep3/scratch/project_465001902/datasets/norkystv3-hindcast-3day-surface.zarr #global
-            thinning: 50
+            #thinning: 4
         adjust: all
-        min_distance_km: 1 #test both thinning and min_distance 
+        #min_distance_km: 0.8 #test both thinning and min_distance 
     attributes:
       cutout_mask:
         _target_: anemoi.graphs.nodes.attributes.CutOutMask
@@ -32,7 +32,7 @@ nodes:
   hidden:
     node_builder:
       _target_: anemoi.graphs.nodes.LimitedAreaTriNodes
-      resolution: 2 # change this to something much higher
+      resolution: 8 # change this to something much higher
       reference_node_name: data
       mask_attr_name: cutout_mask
   
@@ -46,7 +46,7 @@ edges:
     source_mask_attr_name: null
     target_mask_attr_name: null
   - _target_: anemoi.graphs.edges.CutOffEdges # connects only boundary nodes
-    cutoff_factor: 1.5 # only for cutoff method
+    cutoff_factor: 0.6 # only for cutoff method
     source_mask_attr_name: boundary_mask
     target_mask_attr_name: null
   attributes: 
@@ -62,7 +62,7 @@ edges:
   edge_builders:
   - _target_: anemoi.graphs.edges.MultiScaleEdges
     x_hops: 1
-    scale_resolutions: ${nodes.hidden.node_builder.resolution}
+    scale_resolutions: 8 # Annoying that it doesn't permit me to write ${nodes.hidden.node_builder.resolution} or similar anywhere
     source_mask_attr_name: null
     target_mask_attr_name: null
   attributes: 
@@ -87,4 +87,5 @@ edges:
     edge_dirs:
       _target_: anemoi.graphs.edges.attributes.EdgeDirection
       norm: unit-std
+
 
