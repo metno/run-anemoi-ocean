@@ -14,7 +14,8 @@ if [ ! -d anemoi-core ]; then
     git clone --branch main https://github.com/ecmwf/anemoi-core.git
     cd anemoi-core
     git remote set-url origin git@github.com:ecmwf/anemoi-core.git
-    git reset --hard 26f2d92d77fe341459fde722f2e9b965751c47ce #chore(main): Release models 0.7.0 (#324)
+    #git reset --hard c425068cffbc0f8767e98148bfe4db7eb1e4c7fb # chore: Release main (#364) too new?
+    git reset --hard 35b2e9e4e0061fe00a5065fb11045f2a83c81168 # chore: Release main (#360)
     cd ..
 fi
 
@@ -41,7 +42,7 @@ if [ ! -d anemoi-datasets ]; then
     git clone https://github.com/ecmwf/anemoi-datasets.git
     cd anemoi-datasets
     git remote set-url origin git@github.com:metno/anemoi-datasets.git
-    git reset --hard 7fe6eb0a1d816ff409ddc61bacc737af7d2e7de2 # commit chore(main): Release 0.5.21
+    git reset --hard f777112555e74c109e02b8265bfb4ce137374506 # chore(main): Release 0.5.25 (#343)
     cd ..
 fi
 pip install --user --no-deps -e anemoi-datasets
