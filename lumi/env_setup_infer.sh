@@ -23,7 +23,7 @@ if [ ! -d anemoi-inference ]; then
     git clone https://github.com/ecmwf/anemoi-inference.git
     cd anemoi-inference
     git remote set-url origin git@github.com:ecmwf/anemoi-inference.git
-    #git reset --hard ffc2a03e282301586bb8abd92d4d54784f3a0381 #chore(main): Release 0.6.0 (#229)
+    git reset --hard c02c45aa1329fdc0c660ee2d7eccac2b15bc0514 # working version with current runner.py
     echo "Copying runner.py to anemoi-inference/src/anemoi/inference/ to avoid cuda-bug"
     cp ../runner.py ./src/anemoi/inference/
     cat ./src/anemoi/inference/runner.py | grep cuda
@@ -34,4 +34,4 @@ fi
 pip install --user -e anemoi-inference # consider adding dependencies to container later
 
 echo "Did the runner.py copy work?"
-cat ./src/anemoi/inference/runner.py | grep cuda
+cat ./anemoi-inference/src/anemoi/inference/runner.py | grep cuda
