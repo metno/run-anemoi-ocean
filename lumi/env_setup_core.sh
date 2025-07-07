@@ -50,3 +50,6 @@ pip install --user --no-deps -e anemoi-datasets
 # Get the mlflow package to do offline sync
 # Recomended way to install from README on GitHub
 pip install git+https:///github.com/mlflow/mlflow-export-import/#egg=mlflow-export-import
+
+cp lam.yaml ./anemoi-core/training/src/anemoi/training/config/training/scalers/
+cat ./anemoi-core/training/src/anemoi/training/config/training/scalers/lam.yaml | grep tendency
