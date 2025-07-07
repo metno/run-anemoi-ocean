@@ -47,27 +47,22 @@ data:
     
   processors:
     imputer:
-      #_target_: anemoi.models.preprocessing.imputer.InputImputer #ConstantImputer
-      #config: 
-      #  default: "none"
-      #  minimum: []
-      #  none: []
-      #  mean:  # TODO specify "none" for the other variables?
-      #  - temperature_0
-      #  - salinity_0
-      #  - zeta
-      
-      # TODO: would like to use InputImputer but we get this error:
-      # hydra.errors.InstantiationException: Error in call to target 'anemoi.models.preprocessing.imputer.InputImputer':
-      # TypeError("Statistics <class 'omegaconf.dictconfig.DictConfig'> is optional and not a dictionary")
-
-      _target_: anemoi.models.preprocessing.imputer.ConstantImputer
-      config:
+      _target_: anemoi.models.preprocessing.imputer.InputImputer
+      _convert_: all
+      config: 
         default: "none"
-        0:
-        - temperature_0
+        mean:  
         - salinity_0
+        - temperature_0
+        - u_eastward_0
+        - v_northward_0
         - zeta
+        # Mean:
+        # salinity_0 34.2275
+        # temperature_0 8.85046375
+        # u_eastward_0 0.0181013125
+        # v_northward_0 0.013216155
+        # zeta -0.22607975000000002
   
     normalizer:
       _target_: anemoi.models.preprocessing.normalizer.InputNormalizer
