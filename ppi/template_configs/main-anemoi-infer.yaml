@@ -1,13 +1,13 @@
 # Docs:
 # https://anemoi.readthedocs.io/projects/inference/en/latest/inference/configs/top-level.html
 
-checkpoint: /lustre/storeB/project/fou/hi/foccus/experiments/lam-gridind-res10-2017-24-cloud-slow/checkpoint/inference-last.ckpt
+checkpoint: /lustre/storeB/project/fou/hi/foccus/experiments/lam-gridind-res10-2017-24-cloud-less-gpu/checkpoint/inference-anemoi-by_time-epoch_017-step_041581.ckpt
 
 date: 2024-03-02 #specifies the reference date of the forecast (the starting date)
 
-lead_time: 48h # specifies the forecast lead time in hours
+lead_time: 2h # specifies the forecast lead time in hours
 
-#device: cuda
+device: cuda
 #runner: parallel # run across multiple gpus
 
 #input: test # use the dataset that was used during training as input. test (default), training or validation
@@ -22,38 +22,14 @@ input:
     - dataset:
         join: # joining all main and forcing datasets from 2023-2024
           - concat: 
-            - dataset: /lustre/storeB/project/fou/hi/foccus/datasets/norkystv3_hindcast_2017_surface.zarr
-            - dataset: /lustre/storeB/project/fou/hi/foccus/datasets/norkystv3_hindcast_2018_surface.zarr
-            - dataset: /lustre/storeB/project/fou/hi/foccus/datasets/norkystv3_hindcast_2019_surface.zarr
-            - dataset: /lustre/storeB/project/fou/hi/foccus/datasets/norkystv3_hindcast_2020_surface.zarr
-            - dataset: /lustre/storeB/project/fou/hi/foccus/datasets/norkystv3_hindcast_2021_surface.zarr
-            - dataset: /lustre/storeB/project/fou/hi/foccus/datasets/norkystv3_hindcast_2022_surface.zarr
             - dataset: /lustre/storeB/project/fou/hi/foccus/datasets/norkystv3_hindcast_2023_surface.zarr
             - dataset: /lustre/storeB/project/fou/hi/foccus/datasets/norkystv3_hindcast_2024_surface.zarr
             frequency: 3h
           - concat:
-            - dataset: /lustre/storeB/project/fou/hi/foccus/datasets/norkystv3_forcing_zarr/forcing_norkystv3_hindcast_2017.zarr
-              start: 2017
-              end: 2017
-            - dataset: /lustre/storeB/project/fou/hi/foccus/datasets/norkystv3_forcing_zarr/forcing_norkystv3_hindcast_2018.zarr
-              start: 2018
-              end: 2018
-            - dataset: /lustre/storeB/project/fou/hi/foccus/datasets/norkystv3_forcing_zarr/forcing_norkystv3_hindcast_2019.zarr
-              start: 2019
-              end: 2019
-            - dataset: /lustre/storeB/project/fou/hi/foccus/datasets/norkystv3_forcing_zarr/forcing_norkystv3_hindcast_2020.zarr
-              start: 2020
-              end: 2020
-            - dataset: /lustre/storeB/project/fou/hi/foccus/datasets/norkystv3_forcing_zarr/forcing_norkystv3_hindcast_2021.zarr
-              start: 2021
-              end: 2021
-            - dataset: /lustre/storeB/project/fou/hi/foccus/datasets/norkystv3_forcing_zarr/forcing_norkystv3_hindcast_2022.zarr
-              start: 2022
-              end: 2022
-            - dataset: /lustre/storeB/project/fou/hi/foccus/datasets/norkystv3_forcing_zarr/forcing_norkystv3_hindcast_2023.zarr
+            - dataset: /lustre/storeB/project/fou/hi/foccus/datasets/forcing_norkystv3_hindcast_zarr/forcing_norkystv3_hindcast_2023.zarr
               start: 2023
               end: 2023
-            - dataset: /lustre/storeB/project/fou/hi/foccus/datasets/norkystv3_forcing_zarr/forcing_norkystv3_hindcast_2024.zarr
+            - dataset: /lustre/storeB/project/fou/hi/foccus/datasets/forcing_norkystv3_hindcast_zarr/forcing_norkystv3_hindcast_2024.zarr
               start: 2024
               end: 2024
             frequency: 3h
@@ -61,38 +37,14 @@ input:
       trim_edge: 10
     - join:
       - concat: 
-        - dataset: /lustre/storeB/project/fou/hi/foccus/datasets/norkystv3_hindcast_2017_surface.zarr
-        - dataset: /lustre/storeB/project/fou/hi/foccus/datasets/norkystv3_hindcast_2018_surface.zarr
-        - dataset: /lustre/storeB/project/fou/hi/foccus/datasets/norkystv3_hindcast_2019_surface.zarr
-        - dataset: /lustre/storeB/project/fou/hi/foccus/datasets/norkystv3_hindcast_2020_surface.zarr
-        - dataset: /lustre/storeB/project/fou/hi/foccus/datasets/norkystv3_hindcast_2021_surface.zarr
-        - dataset: /lustre/storeB/project/fou/hi/foccus/datasets/norkystv3_hindcast_2022_surface.zarr
         - dataset: /lustre/storeB/project/fou/hi/foccus/datasets/norkystv3_hindcast_2023_surface.zarr
         - dataset: /lustre/storeB/project/fou/hi/foccus/datasets/norkystv3_hindcast_2024_surface.zarr
         frequency: 3h
       - concat:
-        - dataset: /lustre/storeB/project/fou/hi/foccus/datasets/norkystv3_forcing_zarr/forcing_norkystv3_hindcast_2017.zarr
-          start: 2017
-          end: 2017
-        - dataset: /lustre/storeB/project/fou/hi/foccus/datasets/norkystv3_forcing_zarr/forcing_norkystv3_hindcast_2018.zarr
-          start: 2018
-          end: 2018
-        - dataset: /lustre/storeB/project/fou/hi/foccus/datasets/norkystv3_forcing_zarr/forcing_norkystv3_hindcast_2019.zarr
-          start: 2019
-          end: 2019
-        - dataset: /lustre/storeB/project/fou/hi/foccus/datasets/norkystv3_forcing_zarr/forcing_norkystv3_hindcast_2020.zarr
-          start: 2020
-          end: 2020
-        - dataset: /lustre/storeB/project/fou/hi/foccus/datasets/norkystv3_forcing_zarr/forcing_norkystv3_hindcast_2021.zarr
-          start: 2021
-          end: 2021
-        - dataset: /lustre/storeB/project/fou/hi/foccus/datasets/norkystv3_forcing_zarr/forcing_norkystv3_hindcast_2022.zarr
-          start: 2022
-          end: 2022
-        - dataset: /lustre/storeB/project/fou/hi/foccus/datasets/norkystv3_forcing_zarr/forcing_norkystv3_hindcast_2023.zarr
+        - dataset: /lustre/storeB/project/fou/hi/foccus/datasets/forcing_norkystv3_hindcast_zarr/forcing_norkystv3_hindcast_2023.zarr
           start: 2023
           end: 2023
-        - dataset: /lustre/storeB/project/fou/hi/foccus/datasets/norkystv3_forcing_zarr/forcing_norkystv3_hindcast_2024.zarr
+        - dataset: /lustre/storeB/project/fou/hi/foccus/datasets/forcing_norkystv3_hindcast_zarr/forcing_norkystv3_hindcast_2024.zarr
           start: 2024
           end: 2024
       adjust: ["start", "end"]
@@ -103,6 +55,6 @@ output:
   extract_lam:
     output:
       netcdf:
-        path: /lustre/storeB/project/fou/hi/foccus/mateuszm/run-anemoi-ocean/ppi/test.nc
+        path: /lustre/storeB/project/fou/hi/foccus/mateuszm/run-anemoi-ocean/ppi/gh200-test.nc
 
 # its also possible to output truth

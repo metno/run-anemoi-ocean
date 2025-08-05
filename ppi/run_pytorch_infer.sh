@@ -7,7 +7,6 @@
 # Example:
 #
 #   srun singularity exec -B ... run-pytorch.py
-
 # Printing GPU information to terminal once
 if [ $SLURM_LOCALID -eq 0 ] ; then
     rocm-smi
@@ -90,8 +89,6 @@ export HSA_FORCE_FINE_GRAIN_PCIE=1
 export HYDRA_FULL_ERROR=1
 export AIFS_BASE_SEED=1337420
 
-export PYTHONUSERBASE=$VIRTUAL_ENV
-export PATH=$PATH:$VIRTUAL_ENV/bin
-
 #bris --config=$1 
+pip list
 anemoi-inference run $1
