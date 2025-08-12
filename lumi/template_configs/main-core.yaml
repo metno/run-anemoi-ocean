@@ -112,7 +112,7 @@ dataloader:
             end: 2024
           - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_force}
             frequency: ${data.frequency}
-          #- dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_force12-16}
+          #- dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_force12-16} # Enable this for longer training. Then exclude cloud-
           #  frequency: ${data.frequency}
         adjust: ["start", "end"]
       trim_edge: 10
@@ -130,44 +130,6 @@ dataloader:
     _target_: anemoi.training.data.grid_indices.MaskedGrid
     nodes_name: data
     node_attribute_name: indices_connected_nodes
-    
-  #dataset:
-  #  cutout:
-  #  - dataset:
-  #      join: # joining all main and forcing datasets from 2023-2024
-  #        - concat: 
-  #          - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_main23}
-  #          - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_main24}
-  #          frequency: ${data.frequency}
-  #        - concat:
-  #          - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_force23}
-  #            start: 2023
-  #            end: 2023
-  #          - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_force24}
-  #            start: 2024
-  #            end: 2024
-  #          frequency: ${data.frequency}
-  #      adjust: ["start", "end"]
-  #    trim_edge: 10
-  #  - join:
-  #    - concat: 
-  #      - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_main23}
-  #      - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_main24}
-  #      frequency: ${data.frequency}
-  #    - concat:
-  #      - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_force23}
-  #        start: 2023
-  #        end: 2023
-  #      - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_force24}
-  #        start: 2024
-  #        end: 2024
-  #      frequency: ${data.frequency}
-  #    adjust: ["start", "end"]
-  #  adjust: all
-  #grid_indices: # suggested by lam.yaml, gives correct indices
-  #  _target_: anemoi.training.data.grid_indices.MaskedGrid
-  #  nodes_name: data
-  #  node_attribute_name: indices_connected_nodes
 
   training:
     dataset: ${dataloader.dataset} 
@@ -212,13 +174,13 @@ hardware:
     dataset:
       dataset_main: norkystv3_hindcast_2012-2024.zarr
       dataset_force: norkystv3_forcing_zarr/forcing_norkystv3_hindcast_2017-2024.zarr
-      #dataset_force12-16: norkystv3_forcing_zarr/forcing_norkystv3_hindcast_2012-2016.zarr 
+      #dataset_force12-16: norkystv3_forcing_zarr/forcing_norkystv3_hindcast_2012-2016.zarr  # Enable this for longer training. Then exclude cloud-
     graph: trim_edge_10_res_10.pt
     warm_start: null #specific checkpoint to start from, defaults to last.ckpt
 
   #num_gpus_per_node: 1 # using slurm.yaml so these two are now read from SLURM env vars set in lumi_jobscript.sh
   #num_nodes: 1
-  num_gpus_per_model: 4 # TODO: 8 better? This is so-called "model-paralell"
+  num_gpus_per_model: 8 # TODO: 8 better? This is so-called "model-paralell"
 
 graph:
   overwrite: False # only create/re-generate the graph with True
@@ -271,7 +233,7 @@ training:
   load_weights_only: False #loads entire model if False, loads only weights if True
   
   max_epochs: null
-  max_steps: 5000
+  max_steps: 50000
   lr:
     warmup: 1000 # number of warmup iterations
     rate: 6.25e-5 #local_lr
