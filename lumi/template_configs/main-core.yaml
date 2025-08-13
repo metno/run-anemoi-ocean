@@ -105,37 +105,28 @@ dataloader:
   dataset:
     cutout:
     - dataset:
-        join: # joining all main and forcing datasets from 2023-2024
-          - concat: 
-            - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_main23}
-            - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_main24}
+        join:
+          - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_main}
             frequency: ${data.frequency}
-          - concat:
-            - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_force23}
-              start: 2023
-              end: 2023
-            - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_force24}
-              start: 2024
-              end: 2024
+            start: 2017
+            end: 2024
+          - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_force}
             frequency: ${data.frequency}
+          #- dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_force12-16} # Enable this for longer training. Then exclude cloud-
+          #  frequency: ${data.frequency}
         adjust: ["start", "end"]
       trim_edge: 10
-    - join:
-      - concat: 
-        - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_main23}
-        - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_main24}
-        frequency: ${data.frequency}
-      - concat:
-        - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_force23}
-          start: 2023
-          end: 2023
-        - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_force24}
-          start: 2024
-          end: 2024
-        frequency: ${data.frequency}
-      adjust: ["start", "end"]
+    - dataset:
+        join:
+          - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_main}
+            frequency: ${data.frequency}
+          - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_force}
+            frequency: ${data.frequency}
+          #- dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_force12-16}
+          #  frequency: ${data.frequency}
+        adjust: ["start", "end"]
     adjust: all
-  grid_indices: # suggested by lam.yaml, gives correct indices
+  grid_indices:
     _target_: anemoi.training.data.grid_indices.MaskedGrid
     nodes_name: data
     node_attribute_name: indices_connected_nodes
@@ -169,7 +160,7 @@ diagnostics:
       authentication: True
       tracking_uri: https://mlflow.ecmwf.int
       experiment_name: 'metno-fou'
-      run_name: 'lam-gridind-res10-2017-24-cloud' #change this
+      run_name: 'replace-zarr' #change this
     wandb: 
       entity: null
   print_memory_summary: True
@@ -177,14 +168,13 @@ diagnostics:
 hardware:
   paths:
     data: /pfs/lustrep3/scratch/project_465001902/datasets/
-    output: /pfs/lustrep3/scratch/project_465001902/experiments/lam-gridind-res10-2017-24-cloud/
+    output: /pfs/lustrep3/scratch/project_465001902/experiments/replace-zarr/
     graph: /pfs/lustrep3/scratch/project_465001902/graphs/
   files:
     dataset:
-      dataset_main23: norkystv3_hindcast_2023_surface.zarr
-      dataset_main24: norkystv3_hindcast_2024_surface.zarr
-      dataset_force23: norkystv3_forcing_zarr/forcing_norkystv3_hindcast_2023.zarr
-      dataset_force24: norkystv3_forcing_zarr/forcing_norkystv3_hindcast_2024.zarr
+      dataset_main: norkystv3_hindcast_2012-2024.zarr
+      dataset_force: norkystv3_forcing_zarr/forcing_norkystv3_hindcast_2017-2024.zarr
+      #dataset_force12-16: norkystv3_forcing_zarr/forcing_norkystv3_hindcast_2012-2016.zarr  # Enable this for longer training. Then exclude cloud-
     graph: trim_edge_10_res_10.pt
     warm_start: null #specific checkpoint to start from, defaults to last.ckpt
 
