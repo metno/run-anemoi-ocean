@@ -32,7 +32,7 @@ nodes:
   hidden:
     node_builder:
       _target_: anemoi.graphs.nodes.LimitedAreaTriNodes
-      resolution: 8 # change this to something much higher
+      resolution: 12 # change this to something much higher
       reference_node_name: data
       mask_attr_name: cutout_mask
   
@@ -62,7 +62,7 @@ edges:
   edge_builders:
   - _target_: anemoi.graphs.edges.MultiScaleEdges
     x_hops: 1
-    scale_resolutions: 8 # Annoying that it doesn't permit me to write ${nodes.hidden.node_builder.resolution} or similar anywhere
+    scale_resolutions: 12 # Annoying that it doesn't permit me to write ${nodes.hidden.node_builder.resolution} or similar anywhere
     source_mask_attr_name: null
     target_mask_attr_name: null
   attributes: 
@@ -88,4 +88,8 @@ edges:
       _target_: anemoi.graphs.edges.attributes.EdgeDirection
       norm: unit-std
 
-
+post_processors:
+  - _target_: anemoi.graphs.processors.RemoveUnconnectedNodes
+    nodes_name: data
+    ignore: cutout_mask # optional
+    save_mask_indices_to_attr: indices_connected_nodes # optional
