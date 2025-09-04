@@ -28,7 +28,7 @@ data:
   - Tair   
   - Uwind
   - Vwind              
-  - cloud # available from 2017       
+  #- cloud # available from 2017       
   - cos_julian_day   
   - cos_latitude     
   - cos_local_time   
@@ -71,6 +71,7 @@ data:
         default: "mean-std"
         std: []
         min-max:
+        - salinity_0
         max: # Data is normalised by dividing by the max value (, so the ‘zero’ point and the proportional distance from this point is retained)
         - h
         none:
@@ -83,7 +84,7 @@ data:
         - sin_latitude   
         - sin_local_time
         - sin_longitude
-        - cloud # available from 2017
+        #- cloud # available from 2017
         - river_binary_mask
         - sea_mask
       
@@ -108,22 +109,32 @@ dataloader:
         join:
           - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_main}
             frequency: ${data.frequency}
-            start: 2017
-            end: 2024
-          - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_force}
-            frequency: ${data.frequency}
-          #- dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_force12-16} # Enable this for longer training. Then exclude cloud-
-          #  frequency: ${data.frequency}
+          - concat: # this part will be replaced once the full combined forcing file is done rsyncing
+            - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_force12-16}
+              frequency: ${data.frequency}
+              start: 2012
+              end: 2016
+            - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_force17-24}
+              frequency: ${data.frequency}
+              start: 2017
+              end: 2024
+              drop: ["cloud"]
         adjust: ["start", "end"]
       trim_edge: 10
     - dataset:
         join:
           - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_main}
             frequency: ${data.frequency}
-          - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_force}
-            frequency: ${data.frequency}
-          #- dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_force12-16}
-          #  frequency: ${data.frequency}
+          - concat: # this part will be replaced once the full combined forcing file is done rsyncing
+            - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_force12-16}
+              frequency: ${data.frequency}
+              start: 2012
+              end: 2016
+            - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_force17-24}
+              frequency: ${data.frequency}
+              start: 2017
+              end: 2024
+              drop: ["cloud"]
         adjust: ["start", "end"]
     adjust: all
   grid_indices:
@@ -133,20 +144,20 @@ dataloader:
 
   training:
     dataset: ${dataloader.dataset} 
-    start: 2023-01-01
-    end: 2023-12-31
+    start: 2012-01-01
+    end: 2022-06-30
     drop: ['vbar_northward', 'ubar_eastward', 'Uwind_eastward', 'Vwind_northward']
 
   validation_rollout: 1 # TODO change later
 
   validation:
     dataset: ${dataloader.dataset}
-    start: 2024-01-01
-    end: 2024-02-29
+    start: 2022-07-01
+    end: 2023-09-30
     drop: ['vbar_northward', 'ubar_eastward', 'Uwind_eastward', 'Vwind_northward']
   test:
     dataset: ${dataloader.dataset}
-    start: 2024-03-01
+    start: 2023-10-01
     end: 2024-12-31
     drop: ['vbar_northward', 'ubar_eastward', 'Uwind_eastward', 'Vwind_northward']
 
@@ -160,7 +171,7 @@ diagnostics:
       authentication: True
       tracking_uri: https://mlflow.ecmwf.int
       experiment_name: 'metno-fou'
-      run_name: 'replace-zarr' #change this
+      run_name: 'replace-me' #change this
     wandb: 
       entity: null
   print_memory_summary: True
@@ -168,14 +179,14 @@ diagnostics:
 hardware:
   paths:
     data: /pfs/lustrep3/scratch/project_465001902/datasets/
-    output: /pfs/lustrep3/scratch/project_465001902/experiments/replace-zarr/
+    output: /pfs/lustrep3/scratch/project_465001902/experiments/replace-me/
     graph: /pfs/lustrep3/scratch/project_465001902/graphs/
   files:
     dataset:
       dataset_main: norkystv3_hindcast_2012-2024.zarr
-      dataset_force: norkystv3_forcing_zarr/forcing_norkystv3_hindcast_2017-2024.zarr
-      #dataset_force12-16: norkystv3_forcing_zarr/forcing_norkystv3_hindcast_2012-2016.zarr  # Enable this for longer training. Then exclude cloud-
-    graph: trim_edge_10_res_10.pt
+      dataset_force12-16: norkystv3_forcing_zarr/forcing_norkystv3_hindcast_2012-2016.zarr  # Enable this for longer training. Then exclude cloud.
+      dataset_force17-24: norkystv3_forcing_zarr/forcing_norkystv3_hindcast_2017-2024.zarr
+    graph: LAM-trimedge-10-res-12-scale12.pt 
     warm_start: null #specific checkpoint to start from, defaults to last.ckpt
 
   #num_gpus_per_node: 1 # using slurm.yaml so these two are now read from SLURM env vars set in lumi_jobscript.sh
@@ -184,15 +195,6 @@ hardware:
 
 graph:
   overwrite: False # only create/re-generate the graph with True
-  nodes:
-    data:
-      hidden:
-        node_builder:
-          resolution: 10
-  attributes:
-    nodes:
-      area_weight:
-        _target_: anemoi.graphs.nodes.attributes.UniformWeights # default is PlanarAreaWeights
 
 model: 
   num_channels: 256 #1024 #TODO: this number dont have to be so large when have few vars, use higher nr when have more layers vars. Test to see if higher than 256 gives added value. Or higher when have less mesh points (remove land)
@@ -203,12 +205,12 @@ model:
     hidden2data: 0
     hidden2hidden: 0 # GNN and GraphTransformer Processor only
   bounding: #These are applied in order
-    - _target_: anemoi.models.layers.bounding.ReluBounding #[0, infinity)
-      variables: [salinity_0]
-    - _target_: anemoi.models.layers.bounding.NormalizedReluBounding
-      variables: [temperature_0]
-      min_val: [-2]
-      normalizer: ['mean-std']
+    - _target_: anemoi.models.layers.bounding.ReluBounding
+      variables: [] #[salinity_0]
+    #- _target_: anemoi.models.layers.bounding.NormalizedReluBounding
+    #  variables: [temperature_0]
+    #  min_val: [-2]
+    #  normalizer: ['mean-std']
   output_mask: # suggested by lam.yaml
     _target_: anemoi.training.utils.masks.Boolean1DMask
     nodes_name: ${graph.data}
@@ -233,7 +235,7 @@ training:
   load_weights_only: False #loads entire model if False, loads only weights if True
   
   max_epochs: null
-  max_steps: 50000
+  max_steps: 20000
   lr:
     warmup: 1000 # number of warmup iterations
     rate: 6.25e-5 #local_lr
