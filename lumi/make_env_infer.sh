@@ -6,7 +6,7 @@ cd $(pwd -P)
 chmod 770 env_setup_infer.sh
 
 PROJECT_DIR=/pfs/lustrep3/scratch/project_465001902
-CONTAINER=$PROJECT_DIR/container/ocean-ai-pytorch-2.3.1-rocm-6.0.3-py-3.11.5-v0.0.sif
+CONTAINER=$PROJECT_DIR/container/pytorch-2.7.0-rocm-6.2.4-py-3.12.9-v2.0.sif
 
 # Clone and pip install anemoi repos from the container
 singularity exec -B /pfs:/pfs $CONTAINER $(pwd -P)/env_setup_infer.sh

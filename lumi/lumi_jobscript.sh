@@ -1,13 +1,13 @@
 #!/bin/bash
 #SBATCH --output=outputs/%x_%j.out
 #SBATCH --error=outputs/%x_%j.err
-#SBATCH --nodes=32
+#SBATCH --nodes=8
 #SBATCH --ntasks-per-node=8
 #SBATCH --account=project_465001902
 #SBATCH --partition=standard-g
 #SBATCH --gpus-per-node=8
 #SBATCH --time=2-00:00:00
-#SBATCH --job-name=myjobname
+#SBATCH --job-name=256
 #SBATCH --exclusive
 
 CONFIG_NAME=main-core.yaml 

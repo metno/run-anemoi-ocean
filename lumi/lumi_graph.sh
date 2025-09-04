@@ -20,7 +20,7 @@ chmod 770 ${CONTAINER_SCRIPT}
 CONFIG_DIR=$(pwd -P)
 # NB! in order to avoid NCCL timeouts it is adviced to use 
 # pytorch 2.3.1 or above to have NCCL 2.18.3 version
-CONTAINER=$PROJECT_DIR/container/ocean-ai-infer-pytorch-2.3.1-rocm-6.0.3-py-3.11.5-v0.0.sif
+CONTAINER=$PROJECT_DIR/container/pytorch-2.7.0-rocm-6.2.4-py-3.12.9-v2.0.sif
 VENV=$(pwd -P)/.venv
 export VIRTUAL_ENV=$VENV
 
