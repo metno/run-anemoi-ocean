@@ -1,13 +1,13 @@
 #!/bin/bash
 #SBATCH --output=outputs/%x_%j.out
 #SBATCH --error=outputs/%x_%j.err
-#SBATCH --nodes=16
+#SBATCH --nodes=32
 #SBATCH --ntasks-per-node=8
 #SBATCH --account=project_465001902
 #SBATCH --partition=standard-g
 #SBATCH --gpus-per-node=8
 #SBATCH --time=2-00:00:00
-#SBATCH --job-name=2017-24-gridind
+#SBATCH --job-name=myjobname
 #SBATCH --exclusive
 
 CONFIG_NAME=main-core.yaml 
@@ -19,11 +19,11 @@ chmod 770 ${CONTAINER_SCRIPT}
 CONFIG_DIR=$(pwd -P)
 # NB! in order to avoid NCCL timeouts it is adviced to use 
 # pytorch 2.3.1 or above to have NCCL 2.18.3 version
-CONTAINER=$PROJECT_DIR/container/ocean-ai-pytorch-2.3.1-rocm-6.0.3-py-3.11.5-v0.0.sif
+CONTAINER=$PROJECT_DIR/container/pytorch-2.7.0-rocm-6.2.4-py-3.12.9-v2.0.sif
 VENV=$(pwd -P)/.venv
 export VIRTUAL_ENV=$VENV
 
-module load LUMI/24.03 partition/G
+module load LUMI/24.03 #partition/G
 # see https://docs.lumi-supercomputer.eu/hardware/lumig/
 # see https://docs.lumi-supercomputer.eu/runjobs/scheduled-jobs/lumig-job/
 
@@ -42,6 +42,4 @@ srun --cpu-bind=${CPU_BIND} \
                      -B /pfs:/pfs \
                      -B /var/spool/slurmd \
                      -B /opt/cray \
-                     -B /usr/lib64 \
-                     -B /opt/cray/libfabric/1.15.2.0/lib64/libfabric.so.1 \
         $CONTAINER $CONTAINER_SCRIPT $CONFIG_DIR $CONFIG_NAME
