@@ -50,5 +50,15 @@ pip install --user --no-deps -e anemoi-datasets
 # Recomended way to install from README on GitHub
 pip install git+https:///github.com/mlflow/mlflow-export-import/#egg=mlflow-export-import
 
+if [ ! -d anemoi-transform ]; then
+    git clone https://github.com/ecmwf/anemoi-transform.git
+    cd anemoi-transform
+    git remote set-url origin git@github.com:ecmwf/anemoi-transform.git
+    git reset --hard c602c0fd428bb7f48b8868a8e2b6a87cdf4b9c80 # chore(main): release 0.1.16 (#149)
+    cd ..
+fi 
+
+pip install --user --no-deps -e anemoi-transform
+
 cp lam.yaml ./anemoi-core/training/src/anemoi/training/config/training/scalers/
 cat ./anemoi-core/training/src/anemoi/training/config/training/scalers/lam.yaml | grep tendency
