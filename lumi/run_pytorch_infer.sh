@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# This is identical to run_pytorch_rocm624.sh
+
 # This script is meant to be executed within
 # a singularity container where all the 
 # needed packages are available through conda
@@ -10,18 +12,23 @@
 
 # Printing GPU information to terminal once
 if [ $SLURM_LOCALID -eq 0 ] ; then
+    rocm-smi --showtoponuma
     rocm-smi
 fi
 sleep 2
-
-# !Remove this if using an image extended with cotainr or a container from elsewhere.!
-# Start conda environment inside the container
-#$WITH_CONDA
 
 # MIOPEN needs some initialisation for the cache as the default location
 # does not work on LUMI as Lustre does not provide the necessary features.
 export MIOPEN_USER_DB_PATH="/tmp/$(whoami)-miopen-cache-$SLURM_NODEID"
 export MIOPEN_CUSTOM_CACHE_DIR=$MIOPEN_USER_DB_PATH
+
+# The OMP_NUM_THREADS environment variable sets the number of 
+# threads to use for parallel regions by setting the 
+# initial value of the nthreads-var ICV.
+export OMP_NUM_THREADS=6
+
+# Enables MPI to communicate with GPU
+export MPICH_GPU_SUPPORT_ENABLED=1
 
 if [ $SLURM_LOCALID -eq 0 ] ; then
     rm -rf $MIOPEN_USER_DB_PATH
@@ -29,36 +36,48 @@ if [ $SLURM_LOCALID -eq 0 ] ; then
 fi
 sleep 2
 
-# Optional! Set NCCL debug output to check correct use of aws-ofi-rccl (these are very verbose)
-#export NCCL_DEBUG=INFO
-export NCCL_DEBUG=WARN
+# Intel libfabric essential for aws-ofi-rccl
+# change cache monitoring method:
+export FI_MR_CACHE_MONITOR=userfaultfd #memhooks #userfaultfd #memhooks
+export FI_CXI_DISABLE_HOST_REGISTER=1
+
+
+export NCCL_DEBUG=DEBUG #TRACE more detailed LOGS
 export NCCL_DEBUG_SUBSYS=INIT,COLL
 
-# Set interfaces to be used by RCCL.
-# This is needed as otherwise RCCL tries to use a network interface it has
-# no access to on LUMI.
-# new implementation
+# Peer-to-peer communication i.e GPU-to-GPU communication
 export NCCL_P2P_DISABLE=0
-export NCCL_IB_PCI_RELAXED_ORDERING=1
 
-# old implementation
-export NCCL_SOCKET_IFNAME=hsn0,hsn1 #,hsn2,hsn3
-export NCCL_NET_GDR_LEVEL=3 #COL
-export NCCL_IB_GID_INDEX=3
+# Make NCCL use non-default connection.
+# This utilizes the interconnect between the
+# nodes and gpus. hsn0, hsn1, hsn2, hsn3 enables
+# HPE Cray Slingshot-11 with 200Gbp network interconnect
+export NCCL_SOCKET_IFNAME=hsn0,hsn1,hsn2,hsn3
 
-# RCCL specific optimization (new implementation)
-export RCCL_NIC=hsn0,hsn1
-export RCCL_SOCKET_IFNAME=hsn0,hsn1
-export RCCL_BUFFSIZE=16777216 #16mb buff size #8388608
-export RCCL_THREADS=8
+# This ariable allows the user to finely control 
+# when to use GPU Direct RDMA between a NIC and a GPU. 
+# The level defines the maximum distance between the NIC and the GPU. 
+# A string representing the path type should be 
+# used to specify the topographical cutoff for GpuDirect.
+export NCCL_NET_GDR_LEVEL=PHB 
 
+#export NCCL_CROSS_NIC=1
+#export NCCL_ALGO=RING
+# The NCCL_BUFFSIZE variable controls the size of the 
+# buffer used by NCCL when communicating data between pairs of GPUs.
+export NCCL_BUFFSIZE=67108864 # 64mb buffsize
+export NCCL_NTHREADS=1024
 
-# Enable RCCL logging for debugging
-export RCCL_DEBUG=INFO
-export RCCL_DEBUG_SUBSYS=ALL
+# Increasing the number of CUDA CTAs 
+# per peer from 1 to 4 in NCCL send/recv operations 
+# may/can improve performance in sparse communication patterns 
+# set NCCL_NCHANNELS_PER_NET_PEER=4. Makes communication between
+# more stable.
+export NCCL_NCHANNELS_PER_NET_PEER=4
 
-# Set ROCR_VISIBLE_DEVICES so that each task uses the proper GPU
-#export ROCR_VISIBLE_DEVICES=1,2,3,4 #$SLURM_LOCALID
+# Use CUDA cuMem* functions to allocate memory in NCCL.
+export NCCL_CUMEM_ENABLE=1
+
 
 # Report affinity to check
 echo "Rank $SLURM_PROCID --> $(taskset -p $$); GPU $ROCR_VISIBLE_DEVICES"
@@ -81,6 +100,8 @@ get_master_node() {
     echo "$master_node"
 }
 
+# Pytorch (and lightning) setup 
+# for distributed training
 export MASTER_ADDR=$(get_master_node)
 export MASTER_PORT=29500
 export WORLD_SIZE=$SLURM_NPROCS
