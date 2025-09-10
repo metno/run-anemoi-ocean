@@ -25,7 +25,7 @@ CONTAINER=$PROJECT_DIR/container/pytorch-2.7.0-rocm-6.2.4-py-3.12.9-v2.0.sif
 VENV=$(pwd -P)/.venv
 export VIRTUAL_ENV=$VENV
 
-module load LUMI/24.03 partition/G
+module load LUMI/25.03 #partition/G
 # see https://docs.lumi-supercomputer.eu/hardware/lumig/
 # see https://docs.lumi-supercomputer.eu/runjobs/scheduled-jobs/lumig-job/
 
@@ -40,10 +40,8 @@ CPU_BIND="${CPU_BIND},7e00000000,7e0000000000"
 # run run-pytorch.sh in singularity container like recommended
 # in LUMI doc: https://lumi-supercomputer.github.io/LUMI-EasyBuild-docs/p/PyTorch
 srun --cpu-bind=$CPU_BIND \
-    singularity exec -B /pfs:/pfs \
+    singularity exec  \
+                     -B /pfs:/pfs \
                      -B /var/spool/slurmd \
                      -B /opt/cray \
-                     -B /usr/lib64 \
-                     -B /opt/cray/libfabric/1.15.2.0/lib64/libfabric.so.1 \
         $CONTAINER $CONTAINER_SCRIPT $CONFIG_NAME
-
