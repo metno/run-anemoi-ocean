@@ -5,7 +5,7 @@
 #SBATCH --partition=gpuB-arm-research
 #SBATCH --time=01:00:00
 #SBATCH --account=hi-training
-#SBATCH --mem=400g
+#SBATCH --mem=200g
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=mateuszm@met.no
 
@@ -23,5 +23,5 @@ CONFIG_NAME=main-core.yaml
 export HYDRA_FULL_ERROR=1
 export AIFS_BASE_SEED=1337420
 
-bash run_pytorch.sh $CONFIG_DIR $CONFIG_NAME
+srun run_pytorch.sh $CONFIG_DIR $CONFIG_NAME
 
