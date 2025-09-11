@@ -1,0 +1,104 @@
+defaults:
+  - override hydra/job_logging: none
+  - override hydra/hydra_logging: none
+  - _self_
+
+start_date: 2024-03-02T00:00:00 # Start of dataset -> start time = start_date + multistep * timestep
+end_date: 2024-03-02T06:00:00
+
+checkpoints:
+  forecaster:
+    checkpoint_path: /pfs/lustrep3/scratch/project_465001902/experiments/lam-gridind-res10-2024-cloud/checkpoint/c544a0337a0644b8a0c33a92f6d007d5/inference-last.ckpt
+    leadtimes: 6
+    #static_forcings_dataset: null
+    #switch_graph: null
+
+timestep: 3h #Time step of the model
+frequency: 3h #Frequency of the dataset
+
+deterministic: True
+
+run_name: infer-hindcast-2024
+
+dataset_main23: /pfs/lustrep3/scratch/project_465001902/datasets/norkystv3_hindcast_2023_surface.zarr
+dataset_main24: /pfs/lustrep3/scratch/project_465001902/datasets/norkystv3_hindcast_2024_surface.zarr
+dataset_force23: /pfs/lustrep3/scratch/project_465001902/datasets/norkystv3_forcing_zarr/forcing_norkystv3_hindcast_2023.zarr
+dataset_force24: /pfs/lustrep3/scratch/project_465001902/datasets/norkystv3_forcing_zarr/forcing_norkystv3_hindcast_2024.zarr
+
+dataset:
+  cutout:
+  - dataset:
+      join: # joining all main and forcing datasets from 2023-2024
+        - concat: 
+          - dataset: ${dataset_main23}
+          - dataset: ${dataset_main24}
+          frequency: ${frequency}
+        - concat:
+          - dataset: ${dataset_force23}
+            start: 2023
+            end: 2023
+          - dataset: ${dataset_force24}
+            start: 2024
+            end: 2024
+          frequency: ${frequency}
+      adjust: ["start", "end"]
+    trim_edge: 10
+  - join:
+    - concat: 
+      - dataset: ${dataset_main23}
+      - dataset: ${dataset_main24}
+      frequency: ${frequency}
+    - concat:
+      - dataset: ${dataset_force23}
+        start: 2023
+        end: 2023
+      - dataset: ${dataset_force24}
+        start: 2024
+        end: 2024
+      frequency: ${frequency}
+    adjust: ["start", "end"]
+  adjust: all
+
+
+  # Add this if masking land
+  #mask_from_dataset:
+  #  dataset: /pfs/lustrep3/scratch/project_465001902/datasets/mask_norkyst_2024.zarr
+  #  field: land_binary_mask_0
+
+dataloader:
+  datamodule:
+    _target_: bris.data.dataset.NativeGridDataset #anemoi.training.data.dataset.ZipDataset
+    _convert_: all
+  
+  grid_indices: # suggested by lam.yaml, gives correct indices
+    _target_: anemoi.training.data.grid_indices.MaskedGrid
+    nodes_name: data
+    node_attribute_name: indices_connected_nodes
+
+workdir: /pfs/lustrep3/scratch/project_465001902/experiments/lam-gridind-res10-2024-cloud/
+
+hardware:
+  num_gpus_per_node: 8
+  num_gpus_per_model: 4
+  num_nodes: 1
+
+model:
+  _target_: bris.model.brispredictor.BrisPredictor
+  _convert_: all
+
+# Outputs to write. 
+routing:
+  - decoder_index: 0
+    domain_index: 0
+    outputs:
+      #Forecast timeseries as netcdf
+      - netcdf: 
+          filename_pattern: /pfs/lustrep3/scratch/project_465001902/experiments/lam-gridind-res10-2024-cloud/inference/norkystv3_hindcast_2024_surface_pred_%Y%m%dT%HZ.nc
+          # TODO: may run inference output in same dir always (set above)...
+          variables: [u_eastward_0,v_northward_0,temperature_0,salinity_0,zeta] # Leave this empty to include all variables (?)
+          # TODO: may do something like this for absolute current speed
+          #extra_variables: [ws] # Extra outputs (for instance windspeed is not an output from the model and is calculated for each prediction)
+          
+          # Add this if land values have been masked out:
+          #mask_file: /pfs/lustrep3/scratch/project_465001902/datasets/surface_mask.nc
+          #mask_field: land_binary_mask
