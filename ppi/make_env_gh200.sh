@@ -13,5 +13,5 @@
 source /modules/rhel9/aarch64/mamba-mf3/etc/profile.d/ppimam.sh
 mamba activate /home/mateuszm/.conda/envs/gh200-p3.11.5 ## --> Put global stuff into this env?
 
-bash env_setup_core_gh200.sh
+bash env_setup_gh200.sh
 

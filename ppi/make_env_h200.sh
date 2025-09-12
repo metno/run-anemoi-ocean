@@ -13,5 +13,5 @@
 source  /modules/rhel9/x86_64/mamba-mf3/etc/profile.d/ppimam.sh
 mamba h200-p3.11.5 ## --> Put global stuff into this env?
 
-bash env_setup_core_h200.sh
+bash env_setup_h200.sh
 
