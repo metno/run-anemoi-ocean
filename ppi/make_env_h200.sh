@@ -1,8 +1,8 @@
 #!/bin/bash
 #SBATCH --job-name="MakeEnv"
 #SBATCH --output=output/make_env.log
-#SBATCH --gres=gpu:nvidia_gh200_480gb:1 
-#SBATCH --partition=gpuB-arm-research
+#SBATCH --gres=gpu:nvidia_h200_nvl:1
+#SBATCH --partition=gpuB-prod
 #SBATCH --time=10:00:00
 #SBATCH --account=hi-training
 #SBATCH --mem=200g
@@ -13,5 +13,5 @@
 source  /modules/rhel9/x86_64/mamba-mf3/etc/profile.d/ppimam.sh
 mamba h200-p3.11.5 ## --> Put global stuff into this env?
 
-bash env_setup_h200.sh
+bash env_setup.sh
 
