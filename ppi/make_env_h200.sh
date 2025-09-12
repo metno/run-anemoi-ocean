@@ -10,8 +10,8 @@
 #SBATCH --mail-user=mateuszm@met.no
 #SBATCH --ntasks-per-node=1
 
-source /modules/rhel9/aarch64/mamba-mf3/etc/profile.d/ppimam.sh
-mamba activate /home/mateuszm/.conda/envs/gh200-p3.11.5 ## --> Put global stuff into this env?
+source  /modules/rhel9/x86_64/mamba-mf3/etc/profile.d/ppimam.sh
+mamba h200-p3.11.5 ## --> Put global stuff into this env?
 
-bash env_setup_core_gh200.sh
+bash env_setup_core_h200.sh
 
