@@ -3,7 +3,7 @@
 #SBATCH --output=output/make_env.log
 #SBATCH --gres=gpu:nvidia_gh200_480gb:1 
 #SBATCH --partition=gpuB-arm-research
-#SBATCH --time=10:00:00
+#SBATCH --time=00:10:00
 #SBATCH --account=hi-training
 #SBATCH --mem=200g
 #SBATCH --mail-type=ALL
