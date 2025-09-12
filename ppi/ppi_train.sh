@@ -3,11 +3,11 @@
 #SBATCH --output=output/TRAIN_%j.log
 #SBATCH --gres=gpu:nvidia_gh200_480gb:1 
 #SBATCH --partition=gpuB-arm-research
-#SBATCH --time=01:00:00
+#SBATCH --time=24:00:00
 #SBATCH --account=hi-training
-#SBATCH --mem=200g
-#SBATCH --mail-type=ALL
-#SBATCH --mail-user=mateuszm@met.no
+#SBATCH --mem=400g
+##SBATCH --mail-type=ALL
+##SBATCH --mail-user=mateuszm@met.no
 
 
 source /modules/rhel9/aarch64/mamba-mf3/etc/profile.d/ppimam.sh
@@ -22,6 +22,8 @@ CONFIG_NAME=main-core.yaml
 
 export HYDRA_FULL_ERROR=1
 export AIFS_BASE_SEED=1337420
+export PYTHONUSERBASE=$VIRTUAL_ENV
+export PATH=$PATH:$VIRTUAL_ENV/bin
 
-srun run_pytorch.sh $CONFIG_DIR $CONFIG_NAME
+anemoi-training train --config-dir=$CONFIG_DIR --config-name=$CONFIG_NAME
 
