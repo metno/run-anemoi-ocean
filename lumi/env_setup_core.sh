@@ -14,7 +14,7 @@ if [ ! -d anemoi-core ]; then
     git clone --branch main https://github.com/ecmwf/anemoi-core.git
     cd anemoi-core
     git remote set-url origin git@github.com:ecmwf/anemoi-core.git
-    git reset --hard 801c500b00e6381b796d398db8068c25371ec5c1 # chore: Release main (#505)
+    #git reset --hard 801c500b00e6381b796d398db8068c25371ec5c1 # chore: Release main (#505)
     cd ..
 fi
 
@@ -62,3 +62,22 @@ pip install --user --no-deps -e anemoi-transform
 
 cp lam.yaml ./anemoi-core/training/src/anemoi/training/config/training/scalers/
 cat ./anemoi-core/training/src/anemoi/training/config/training/scalers/lam.yaml | grep tendency
+
+if [ ! -d anemoi-inference ]; then
+    echo "Cloning anemoi-inference from ecmwf"
+    git clone https://github.com/ecmwf/anemoi-inference.git
+    cd anemoi-inference
+    git remote set-url origin git@github.com:ecmwf/anemoi-inference.git
+    git reset --hard c02c45aa1329fdc0c660ee2d7eccac2b15bc0514 # working version with current runner.py
+    echo "Copying runner.py to anemoi-inference/src/anemoi/inference/ to avoid cuda-bug"
+    cp ../runner.py ./src/anemoi/inference/
+    cat ./src/anemoi/inference/runner.py | grep cuda
+    cd ..
+fi
+
+#echo "Installing anemoi-inference"
+pip install --user -e anemoi-inference # consider adding dependencies to container later
+
+echo "Did the runner.py copy work?"
+cat ./anemoi-inference/src/anemoi/inference/runner.py | grep cuda
+cp graphtransformer.yaml ./anemoi-core/training/src/anemoi/training/config/model/
