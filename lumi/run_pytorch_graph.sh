@@ -14,31 +14,12 @@ if [ $SLURM_LOCALID -eq 0 ] ; then
 fi
 sleep 2
 
-# !Remove this if using an image extended with cotainr or a container from elsewhere.!
-# Start conda environment inside the container
-#$WITH_CONDA
-
-# MIOPEN needs some initialisation for the cache as the default location
-# does not work on LUMI as Lustre does not provide the necessary features.
-export MIOPEN_USER_DB_PATH="/tmp/$(whoami)-miopen-cache-$SLURM_NODEID"
-export MIOPEN_CUSTOM_CACHE_DIR=$MIOPEN_USER_DB_PATH
-
-# The OMP_NUM_THREADS environment variable sets the number of 
-# threads to use for parallel regions by setting the 
-# initial value of the nthreads-var ICV.
-export OMP_NUM_THREADS=6
-# Enables MPI to communicate with GPU
-export MPICH_GPU_SUPPORT_ENABLED=1
-
-if [ $SLURM_LOCALID -eq 0 ] ; then
-    rm -rf $MIOPEN_USER_DB_PATH
-    mkdir -p $MIOPEN_USER_DB_PATH
-fi
-sleep 2
-
 # Intel libfabric essential for aws-ofi-rccl
 # change cache monitoring method:
-export FI_MR_CACHE_MONITOR=memhooks
+export FI_MR_CACHE_MONITOR=userfaultfd #memhooks #userfaultfd #memhooks
+export FI_CXI_DISABLE_HOST_REGISTER=1
+
+
 export NCCL_DEBUG=DEBUG #TRACE more detailed LOGS
 export NCCL_DEBUG_SUBSYS=INIT,COLL
 
@@ -50,26 +31,32 @@ export NCCL_P2P_DISABLE=0
 # nodes and gpus. hsn0, hsn1, hsn2, hsn3 enables
 # HPE Cray Slingshot-11 with 200Gbp network interconnect
 export NCCL_SOCKET_IFNAME=hsn0,hsn1,hsn2,hsn3
+
 # This ariable allows the user to finely control 
 # when to use GPU Direct RDMA between a NIC and a GPU. 
 # The level defines the maximum distance between the NIC and the GPU. 
 # A string representing the path type should be 
 # used to specify the topographical cutoff for GpuDirect.
-export NCCL_NET_GDR_LEVEL=SYS #COL
+export NCCL_NET_GDR_LEVEL=PHB 
+
+#export NCCL_CROSS_NIC=1
+#export NCCL_ALGO=RING
 # The NCCL_BUFFSIZE variable controls the size of the 
 # buffer used by NCCL when communicating data between pairs of GPUs.
 export NCCL_BUFFSIZE=67108864 # 64mb buffsize
+export NCCL_NTHREADS=1024
 
 # Increasing the number of CUDA CTAs 
 # per peer from 1 to 4 in NCCL send/recv operations 
 # may/can improve performance in sparse communication patterns 
-export NCCL_NCHANNELS_PER_NET_PEER=1
+# set NCCL_NCHANNELS_PER_NET_PEER=4. Makes communication between
+# more stable.
+export NCCL_NCHANNELS_PER_NET_PEER=4
 
 # Use CUDA cuMem* functions to allocate memory in NCCL.
 export NCCL_CUMEM_ENABLE=1
 
-# COMMENT: NCCL_NCHANNELS_PER_NET_PEER and NCCL_CUMEM_ENABLE
-# only works for NCCL 2.18.3 and above
+
 # Report affinity to check
 echo "Rank $SLURM_PROCID --> $(taskset -p $$); GPU $ROCR_VISIBLE_DEVICES"
 
@@ -104,5 +91,4 @@ export AIFS_BASE_SEED=1337420
 
 export PYTHONUSERBASE=$VIRTUAL_ENV
 export PATH=$PATH:$VIRTUAL_ENV/bin
-
 anemoi-graphs create $1 $2 
