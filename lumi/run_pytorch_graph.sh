@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# This is identical to run_pytorch_rocm624.sh
+
 # This script is meant to be executed within
 # a singularity container where all the 
 # needed packages are available through conda
@@ -11,6 +13,26 @@
 # Printing GPU information to terminal once
 if [ $SLURM_LOCALID -eq 0 ] ; then
     rocm-smi --showtoponuma
+    rocm-smi
+fi
+sleep 2
+
+# MIOPEN needs some initialisation for the cache as the default location
+# does not work on LUMI as Lustre does not provide the necessary features.
+export MIOPEN_USER_DB_PATH="/tmp/$(whoami)-miopen-cache-$SLURM_NODEID"
+export MIOPEN_CUSTOM_CACHE_DIR=$MIOPEN_USER_DB_PATH
+
+# The OMP_NUM_THREADS environment variable sets the number of 
+# threads to use for parallel regions by setting the 
+# initial value of the nthreads-var ICV.
+export OMP_NUM_THREADS=6
+
+# Enables MPI to communicate with GPU
+export MPICH_GPU_SUPPORT_ENABLED=1
+
+if [ $SLURM_LOCALID -eq 0 ] ; then
+    rm -rf $MIOPEN_USER_DB_PATH
+    mkdir -p $MIOPEN_USER_DB_PATH
 fi
 sleep 2
 
