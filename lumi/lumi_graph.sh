@@ -1,47 +1,94 @@
 #!/bin/bash
-#SBATCH --output=outputs/%x_%j.out
-#SBATCH --error=outputs/%x_%j.err
-#SBATCH --nodes=1
-#SBATCH --ntasks-per-node=1
-#SBATCH --account=project_465001902
-#SBATCH --partition=standard-g
-#SBATCH --gpus-per-node=1
-#SBATCH --time=05:00:00
-#SBATCH --job-name=graph_creator
-#SBATCH --exclusive
 
-CONFIG_NAME=$(pwd -P)/template_configs/graph.yaml
-GRAPH_NAME=$(pwd -P)/trim_edge_10_res_12.pt
+# This script is meant to be executed within
+# a singularity container where all the 
+# needed packages are available through conda
+#
+# Example:
+#
+#   srun singularity exec -B ... run-pytorch.py
 
-#Should not have to change these
-PROJECT_DIR=/pfs/lustrep3/scratch/$SLURM_JOB_ACCOUNT
-CONTAINER_SCRIPT=$(pwd -P)/run_pytorch_graph.sh
-chmod 770 ${CONTAINER_SCRIPT}
-CONFIG_DIR=$(pwd -P)
-# NB! in order to avoid NCCL timeouts it is adviced to use 
-# pytorch 2.3.1 or above to have NCCL 2.18.3 version
-CONTAINER=$PROJECT_DIR/container/pytorch-2.7.0-rocm-6.2.4-py-3.12.9-v2.0.sif
-VENV=$(pwd -P)/.venv
-export VIRTUAL_ENV=$VENV
+# Printing GPU information to terminal once
+if [ $SLURM_LOCALID -eq 0 ] ; then
+    rocm-smi --showtoponuma
+fi
+sleep 2
 
-module load LUMI/24.03 partition/G
-# see https://docs.lumi-supercomputer.eu/hardware/lumig/
-# see https://docs.lumi-supercomputer.eu/runjobs/scheduled-jobs/lumig-job/
+# Intel libfabric essential for aws-ofi-rccl
+# change cache monitoring method:
+export FI_MR_CACHE_MONITOR=userfaultfd #memhooks #userfaultfd #memhooks
+export FI_CXI_DISABLE_HOST_REGISTER=1
 
-# New bindings see docs above. Correct ordering of cpu affinity
-# excludes first and last core since they are not available 
-# on GPU-nodes
-CPU_BIND="mask_cpu:7e000000000000,7e00000000000000"
-CPU_BIND="${CPU_BIND},7e0000,7e000000"
-CPU_BIND="${CPU_BIND},7e,7e00"
-CPU_BIND="${CPU_BIND},7e00000000,7e0000000000"
 
-# run run-pytorch.sh in singularity container like recommended
-# in LUMI doc: https://lumi-supercomputer.github.io/LUMI-EasyBuild-docs/p/PyTorch
-srun --cpu-bind=$CPU_BIND \
-    singularity exec -B /pfs:/pfs \
-                     -B /var/spool/slurmd \
-                     -B /opt/cray \
-                     -B /usr/lib64 \
-                     -B /opt/cray/libfabric/1.15.2.0/lib64/libfabric.so.1 \
-        $CONTAINER $CONTAINER_SCRIPT $CONFIG_NAME $GRAPH_NAME
+export NCCL_DEBUG=DEBUG #TRACE more detailed LOGS
+export NCCL_DEBUG_SUBSYS=INIT,COLL
+
+# Peer-to-peer communication i.e GPU-to-GPU communication
+export NCCL_P2P_DISABLE=0
+
+# Make NCCL use non-default connection.
+# This utilizes the interconnect between the
+# nodes and gpus. hsn0, hsn1, hsn2, hsn3 enables
+# HPE Cray Slingshot-11 with 200Gbp network interconnect
+export NCCL_SOCKET_IFNAME=hsn0,hsn1,hsn2,hsn3
+
+# This ariable allows the user to finely control 
+# when to use GPU Direct RDMA between a NIC and a GPU. 
+# The level defines the maximum distance between the NIC and the GPU. 
+# A string representing the path type should be 
+# used to specify the topographical cutoff for GpuDirect.
+export NCCL_NET_GDR_LEVEL=PHB 
+
+#export NCCL_CROSS_NIC=1
+#export NCCL_ALGO=RING
+# The NCCL_BUFFSIZE variable controls the size of the 
+# buffer used by NCCL when communicating data between pairs of GPUs.
+export NCCL_BUFFSIZE=67108864 # 64mb buffsize
+export NCCL_NTHREADS=1024
+
+# Increasing the number of CUDA CTAs 
+# per peer from 1 to 4 in NCCL send/recv operations 
+# may/can improve performance in sparse communication patterns 
+# set NCCL_NCHANNELS_PER_NET_PEER=4. Makes communication between
+# more stable.
+export NCCL_NCHANNELS_PER_NET_PEER=4
+
+# Use CUDA cuMem* functions to allocate memory in NCCL.
+export NCCL_CUMEM_ENABLE=1
+
+
+# Report affinity to check
+echo "Rank $SLURM_PROCID --> $(taskset -p $$); GPU $ROCR_VISIBLE_DEVICES"
+
+
+get_master_node() {
+    # Get the first item in the node list
+    first_nodelist=$(echo $SLURM_NODELIST | cut -d',' -f1)
+
+    if [[ "$first_nodelist" == *'['* ]]; then
+        # Split the node list and extract the master node
+        base_name=$(echo "$first_nodelist" | cut -d'[' -f1)
+        range_part=$(echo "$first_nodelist" | cut -d'[' -f2 | cut -d'-' -f1)
+        master_node="${base_name}${range_part}"
+    else
+        # If no range, the first node is the master node
+        master_node="$first_nodelist"
+    fi
+
+    echo "$master_node"
+}
+
+# Pytorch (and lightning) setup 
+# for distributed training
+export MASTER_ADDR=$(get_master_node)
+export MASTER_PORT=29500
+export WORLD_SIZE=$SLURM_NPROCS
+export RANK=$SLURM_PROCID
+
+export HSA_FORCE_FINE_GRAIN_PCIE=1
+export HYDRA_FULL_ERROR=1
+export AIFS_BASE_SEED=1337420
+
+export PYTHONUSERBASE=$VIRTUAL_ENV
+export PATH=$PATH:$VIRTUAL_ENV/bin
+anemoi-graphs create $1 $2 
