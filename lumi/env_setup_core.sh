@@ -80,4 +80,3 @@ pip install --user -e anemoi-inference # consider adding dependencies to contain
 
 echo "Did the runner.py copy work?"
 cat ./anemoi-inference/src/anemoi/inference/runner.py | grep cuda
-cp graphtransformer.yaml ./anemoi-core/training/src/anemoi/training/config/model/
