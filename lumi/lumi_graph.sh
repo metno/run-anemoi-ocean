@@ -3,7 +3,7 @@
 #SBATCH --error=outputs/%x_%j.err
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --account=project_465001902
+#SBATCH --account=project_465002266
 #SBATCH --partition=standard-g
 #SBATCH --gpus-per-node=1
 #SBATCH --time=05:00:00
