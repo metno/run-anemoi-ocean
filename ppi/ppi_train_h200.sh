@@ -7,6 +7,8 @@
 #SBATCH --account=hi-training
 ##SBATCH --mail-type=ALL
 ##SBATCH --mail-user=mateuszm@met.no
+#SBATCH --mem=16G
+#SBATCH --ntasks-per-node=1
 
 
 source  /modules/rhel9/x86_64/mamba-mf3/etc/profile.d/ppimam.sh
@@ -23,6 +25,6 @@ export HYDRA_FULL_ERROR=1
 export AIFS_BASE_SEED=1337420
 export PYTHONUSERBASE=$VIRTUAL_ENV
 export PATH=$PATH:$VIRTUAL_ENV/bin
-
+ulimit -v unlimited
 anemoi-training train --config-dir=$CONFIG_DIR --config-name=$CONFIG_NAME
 
