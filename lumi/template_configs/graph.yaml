@@ -11,10 +11,10 @@ nodes:
       _target_: anemoi.graphs.nodes.AnemoiDatasetNodes
       dataset: 
         cutout:
-          - dataset: /pfs/lustrep3/scratch/project_465001902/datasets/norkystv3-hindcast-3day-surface.zarr #regional
+          - dataset: /pfs/lustrep3/scratch/project_465002266/datasets/norkystv3-hindcast-3day-surface.zarr #regional
             trim_edge: 10
             #thinning: 4
-          - dataset: /pfs/lustrep3/scratch/project_465001902/datasets/norkystv3-hindcast-3day-surface.zarr #global
+          - dataset: /pfs/lustrep3/scratch/project_465002266/datasets/norkystv3-hindcast-3day-surface.zarr #global
             #thinning: 4
         adjust: all
         #min_distance_km: 0.8 #test both thinning and min_distance 

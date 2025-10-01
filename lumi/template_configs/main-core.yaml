@@ -178,9 +178,9 @@ diagnostics:
 
 hardware:
   paths:
-    data: /pfs/lustrep3/scratch/project_465001902/datasets/
-    output: /pfs/lustrep3/scratch/project_465001902/experiments/replace-me/
-    graph: /pfs/lustrep3/scratch/project_465001902/graphs/
+    data: /pfs/lustrep3/scratch/project_465002266/datasets/
+    output: /pfs/lustrep3/scratch/project_465002266/experiments/replace-me/
+    graph: /pfs/lustrep3/scratch/project_465002266/graphs/
   files:
     dataset:
       dataset_main: norkystv3_hindcast_2012-2024.zarr

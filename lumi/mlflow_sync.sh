@@ -1,5 +1,5 @@
 
-PROJECT_DIR=/pfs/lustrep3/scratch/project_465001902
+PROJECT_DIR=/pfs/lustrep3/scratch/project_465002266
 SOURCE=$PROJECT_DIR/experiments/mlflow-test/logs/mlflow/ #INSERT SOURCE PATH f.ex output/logs/mlflow/
 RUNID=0b41c204fc7d409e8d4f110ae111426c # run-id of the run f.ex dca82f0b235542d1bc4e4c8fcdcb71a1
 

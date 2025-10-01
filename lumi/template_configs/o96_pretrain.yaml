@@ -91,9 +91,9 @@ diagnostics:
  
 hardware:
   paths:
-    data: /pfs/lustrep4/scratch/project_465001902/aifs/dataset/
+    data: /pfs/lustrep4/scratch/project_465002266/aifs/dataset/
     output: #Change this
-    graph: /pfs/lustrep4/scratch/project_465001902/aifs/graphs/
+    graph: /pfs/lustrep4/scratch/project_465002266/aifs/graphs/
   files:
     dataset: aifs-ea-an-oper-0001-mars-o96-1979-2022-6h-v6.zarr
     graph: o96_5p_12knn.pt
