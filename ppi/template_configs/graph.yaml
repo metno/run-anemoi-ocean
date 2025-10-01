@@ -13,9 +13,7 @@ nodes:
         cutout:
           - dataset: /lustre/storeB/project/fou/hi/foccus/datasets/norkystv3-hindcast-3day-surface.zarr #regional
             trim_edge: 10
-            thinning: 5
           - dataset: /lustre/storeB/project/fou/hi/foccus/datasets/norkystv3-hindcast-3day-surface.zarr #global
-            thinning: 5
         adjust: all
         #min_distance_km: 0.8 #test both thinning and min_distance 
     attributes:
@@ -26,13 +24,13 @@ nodes:
         masks:
           _target_: anemoi.graphs.nodes.attributes.CutOutMask
       area_weight:
-        _target_: anemoi.graphs.nodes.attributes.UniformWeights # options: Uniform
-        #mask_node_attr_name: cutout_mask ---> this should work with anemoi.graphs.nodes.attributes.MaskedPlanarAreaWeights, but not here
+        _target_: anemoi.graphs.nodes.attributes.MaskedPlanarAreaWeights # options: Uniform
+        mask_node_attr_name: cutout_mask #---> this should work with anemoi.graphs.nodes.attributes.MaskedPlanarAreaWeights, but not here
         norm: unit-max
   hidden:
     node_builder:
       _target_: anemoi.graphs.nodes.LimitedAreaTriNodes
-      resolution: 7 # change this to something much higher
+      resolution: 12 # change this to something much higher
       reference_node_name: data
       mask_attr_name: cutout_mask
   
@@ -62,7 +60,7 @@ edges:
   edge_builders:
   - _target_: anemoi.graphs.edges.MultiScaleEdges
     x_hops: 1
-    scale_resolutions: 7 # Annoying that it doesn't permit me to write ${nodes.hidden.node_builder.resolution} or similar anywhere
+    scale_resolutions: 12 # Annoying that it doesn't permit me to write ${nodes.hidden.node_builder.resolution} or similar anywhere
     source_mask_attr_name: null
     target_mask_attr_name: null
   attributes: 
