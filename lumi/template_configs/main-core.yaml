@@ -11,7 +11,7 @@ defaults:
 - override hydra/job_logging: disabled
 - _self_
 
-config_validation: False
+config_validation: True
 
 hydra:  
   output_subdir: null  
@@ -48,7 +48,6 @@ data:
   processors:
     imputer:
       _target_: anemoi.models.preprocessing.imputer.InputImputer
-      _convert_: all
       config: 
         default: "none"
         mean:  
