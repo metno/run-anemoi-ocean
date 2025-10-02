@@ -42,6 +42,4 @@ srun --cpu-bind=$CPU_BIND \
     singularity exec -B /pfs:/pfs \
                      -B /var/spool/slurmd \
                      -B /opt/cray \
-                     -B /usr/lib64 \
-                     -B /opt/cray/libfabric/1.15.2.0/lib64/libfabric.so.1 \
         $CONTAINER $CONTAINER_SCRIPT $CONFIG_NAME $GRAPH_NAME
