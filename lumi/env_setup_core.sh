@@ -60,9 +60,6 @@ fi
 
 pip install --user --no-deps -e anemoi-transform
 
-cp lam.yaml ./anemoi-core/training/src/anemoi/training/config/training/scalers/
-cat ./anemoi-core/training/src/anemoi/training/config/training/scalers/lam.yaml | grep tendency
-
 if [ ! -d anemoi-inference ]; then
     echo "Cloning anemoi-inference from ecmwf"
     git clone https://github.com/ecmwf/anemoi-inference.git
