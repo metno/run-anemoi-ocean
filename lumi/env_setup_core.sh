@@ -14,7 +14,7 @@ if [ ! -d anemoi-core ]; then
     git clone --branch main https://github.com/ecmwf/anemoi-core.git
     cd anemoi-core
     git remote set-url origin git@github.com:ecmwf/anemoi-core.git
-    git reset --hard 801c500b00e6381b796d398db8068c25371ec5c1 # chore: Release main (#505)
+    git reset --hard 6e8bfb3589ee3fc427bbf7b5b8f3841d2c689b9a # chore: Release main (#521)
     cd ..
 fi
 
