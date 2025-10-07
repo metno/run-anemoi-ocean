@@ -107,6 +107,9 @@ export MASTER_PORT=29500
 export WORLD_SIZE=$SLURM_NPROCS
 export RANK=$SLURM_PROCID
 
+# "If reserved but unallocated memory is large try setting to avoid fragmentation"
+PYTORCH_HIP_ALLOC_CONF=expandable_segments:True,garbage_collection_threshold:0.5
+
 export HSA_FORCE_FINE_GRAIN_PCIE=1
 export HYDRA_FULL_ERROR=1
 export AIFS_BASE_SEED=1337420

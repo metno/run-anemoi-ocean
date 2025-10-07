@@ -226,6 +226,9 @@ model:
     attribute_name: cutout_mask
 
 training:
+  # This supposedly fixes LUMI memory bug affecting loss
+  precision: bf16-mixed
+  
   # This section is to avoid using variable_loss_scaling 
   training_loss:
     # loss class to initialise
