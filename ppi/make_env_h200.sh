@@ -6,8 +6,6 @@
 #SBATCH --time=00:10:00
 #SBATCH --account=hi-training
 #SBATCH --mem=200g
-#SBATCH --mail-type=ALL
-#SBATCH --mail-user=mateuszm@met.no
 #SBATCH --ntasks-per-node=1
 
 source  /modules/rhel9/x86_64/mamba-mf3/etc/profile.d/ppimam.sh
