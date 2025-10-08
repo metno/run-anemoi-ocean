@@ -1,28 +1,23 @@
 #!/bin/bash
-#SBATCH --job-name="GraphH200"
-#SBATCH --output=output/GRAPH_%j.log
-#SBATCH --gres=gpu:nvidia_h200_nvl:2
-#SBATCH --partition=gpuB-prod
-#SBATCH --time=02:00:00
-#SBATCH --account=hi-training
-#SBATCH --mem=200g
-#SBATCH --ntasks-per-node=1
+#$ -l h_rt=4:00:00
+#$ -q research-r8.q
+#$ -l h_rss=20G
+#$ -pe shmem-1 4
+#$ -l mem_free=20G 
+#$ -l h_data=20G
+#$ -o /lustre/storeB/project/fou/hi/foccus/ppi-experiments/planar-graph/run-anemoi-ocean/ppi/output/graph_o.$JOB_ID
+#$ -e /lustre/storeB/project/fou/hi/foccus/ppi-experiments/planar-graph/run-anemoi-ocean/ppi/output/graph_e.$JOB_ID
+#$ -wd /lustre/storeB/project/fou/hi/foccus/ppi-experiments/planar-graph/run-anemoi-ocean/ppi/
 
-GRAPH_NAME=trim_edge_10_res_12_MaskedPlanarAreaWeights.pt
+GRAPH_NAME=trim_edge_10_res_10_cutoff_06_max_num_neighbours_80_MaskedPlanarAreaWeights.pt
 
-source  /modules/rhel9/x86_64/mamba-mf3/etc/profile.d/ppimam.sh
-mamba activate /home/mateuszm/.conda/envs/h200-p3.11.5
+conda deactivate
+VENV=/lustre/storeB/project/fou/hi/foccus/python-envs/anemoi-env-2-10-25/
+source $VENV/bin/activate
 
-VENV=$(pwd -P)/.venv
-export VIRTUAL_ENV=$VENV
-
-RUN_DIR=/lustre/storeB/project/fou/hi/foccus/ppi-experiments/initial_setup/run-anemoi-ocean/ppi/
 CONFIG_DIR=$(pwd -P)/
-CONFIG_NAME=$(pwd -P)/template_configs/graph.yaml
+CONFIG_NAME=$(pwd -P)/graph.yaml
 
-export HYDRA_FULL_ERROR=1
 export AIFS_BASE_SEED=1337420
-export PYTHONUSERBASE=$VIRTUAL_ENV
-export PATH=$PATH:$VIRTUAL_ENV/bin
-ulimit -v unlimited
+
 anemoi-graphs create $CONFIG_NAME $GRAPH_NAME
