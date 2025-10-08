@@ -63,4 +63,3 @@ pip install --user -e anemoi-transform
 cp lam.yaml ./anemoi-core/training/src/anemoi/training/config/training/scalers/
 cat ./anemoi-core/training/src/anemoi/training/config/training/scalers/lam.yaml | grep tendency
 cp graphtransformer.yaml ./anemoi-core/training/src/anemoi/training/config/model/
-pip install torch-cluster
