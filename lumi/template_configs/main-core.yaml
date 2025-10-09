@@ -103,39 +103,20 @@ dataloader:
     test: 20 
   
   dataset:
-    cutout:
-    - dataset:
-        join:
-          - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_main}
-            frequency: ${data.frequency}
-          - concat: # this part will be replaced once the full combined forcing file is done rsyncing
-            - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_force12-16}
-              frequency: ${data.frequency}
-              start: 2012
-              end: 2016
-            - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_force17-24}
-              frequency: ${data.frequency}
-              start: 2017
-              end: 2024
-              drop: ["cloud"]
-        adjust: ["start", "end"]
-      trim_edge: 10
-    - dataset:
-        join:
-          - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_main}
-            frequency: ${data.frequency}
-          - concat: # this part will be replaced once the full combined forcing file is done rsyncing
-            - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_force12-16}
-              frequency: ${data.frequency}
-              start: 2012
-              end: 2016
-            - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_force17-24}
-              frequency: ${data.frequency}
-              start: 2017
-              end: 2024
-              drop: ["cloud"]
-        adjust: ["start", "end"]
-    adjust: all
+    join:
+      - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_main}
+        frequency: ${data.frequency}
+      - concat: # this part will be replaced once the full combined forcing file is done rsyncing
+        - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_force12-16}
+          frequency: ${data.frequency}
+          start: 2012
+          end: 2016
+        - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_force17-24}
+          frequency: ${data.frequency}
+          start: 2017
+          end: 2024
+          drop: ["cloud"]
+    adjust: ["start", "end"]
   grid_indices:
     _target_: anemoi.training.data.grid_indices.MaskedGrid
     nodes_name: data
