@@ -5,14 +5,12 @@
 #SBATCH --partition=gpuB-prod
 #SBATCH --time=24:00:00
 #SBATCH --account=hi-training
-##SBATCH --mail-type=ALL
-##SBATCH --mail-user=mateuszm@met.no
 #SBATCH --mem=16G
 #SBATCH --ntasks-per-node=1
 
 
 source  /modules/rhel9/x86_64/mamba-mf3/etc/profile.d/ppimam.sh
-mamba activate /home/mateuszm/.conda/envs/h200-p3.11.5
+mamba activate /modules/rhel9/x86_64/mamba-mf3/envs/2025-08-development
 
 VENV=$(pwd -P)/.venv
 export VIRTUAL_ENV=$VENV
