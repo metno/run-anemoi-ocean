@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --output=outputs/%x_%j.out
 #SBATCH --error=outputs/%x_%j.err
-#SBATCH --nodes=64
+#SBATCH --nodes=16
 #SBATCH --ntasks-per-node=8
 #SBATCH --account=project_465002266
 #SBATCH --partition=standard-g
