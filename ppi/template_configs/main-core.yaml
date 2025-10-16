@@ -1,0 +1,20 @@
+# this is all paths for ppi, copy the remaining template from /lumi/template_configs/
+      
+hardware:
+  paths:
+    data: /lustre/storeB/project/fou/hi/foccus/datasets/
+    output: /lustre/storeB/project/fou/hi/foccus/ppi-experiments/initial_setup/
+    graph: /lustre/storeB/project/fou/hi/foccus/graphs/
+  files:
+    dataset:
+      dataset_main: norkystv3_hindcast_2012-2024.zarr
+      dataset_force12-16: forcing_norkystv3_hindcast_zarr/forcing_norkystv3_hindcast_2012-2016.zarr  # Enable this for longer training. Then exclude cloud.
+      dataset_force17-24: forcing_norkystv3_hindcast_zarr/forcing_norkystv3_hindcast_2017-2024.zarr
+    graph: LAM-trimedge-10-res-12-scale12.pt 
+    warm_start: null #specific checkpoint to start from, defaults to last.ckpt
+
+  num_gpus_per_node: 1 # using slurm.yaml so these two are now read from SLURM env vars set in lumi_jobscript.sh
+  num_nodes: 1
+  num_gpus_per_model: 1 # TODO: 8 better? This is so-called "model-paralell"
+
+
