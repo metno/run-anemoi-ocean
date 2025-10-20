@@ -1,7 +1,7 @@
 # Docs:
 # https://anemoi.readthedocs.io/projects/inference/en/latest/inference/configs/top-level.html
 
-checkpoint: /pfs/lustrep3/scratch/project_465002266/experiments/lam-gridind-res10-2024-cloud/checkpoint/c544a0337a0644b8a0c33a92f6d007d5/inference-last.ckpt
+checkpoint: /pfs/lustrep3/scratch/project_465002266/experiments/<REST OF CHECKPOINT PATH>inference-last.ckpt
 
 date: 2024-03-02 #specifies the reference date of the forecast (the starting date)
 
@@ -19,14 +19,14 @@ input: test # use the dataset that was used during training as input. test (defa
 #    cutout:
 #      - dataset: ...
 
-#output:
-#  netcdf: /pfs/lustrep3/scratch/project_465002266/experiments/lam-gridind-res10-2024-cloud/inference/full-reset.nc
+output:
+  netcdf: /pfs/lustrep3/scratch/project_465002266/experiments/<PATH TO OUTPUT>/output_name.nc
 
 # Or get only output on the lam area
-output:
-  extract_lam:
-    output:
-      netcdf:
-        path: /pfs/lustrep3/scratch/project_465002266/experiments/lam-gridind-res10-2024-cloud/inference/lam-48h.nc
+#output:
+#  extract_lam:
+#    output:
+#      netcdf:
+#        path: /pfs/lustrep3/scratch/project_465002266/experiments/lam-gridind-res10-2024-cloud/inference/lam-48h.nc
 
 # its also possible to output truth
