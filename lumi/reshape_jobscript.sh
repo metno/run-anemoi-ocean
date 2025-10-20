@@ -7,7 +7,7 @@
 #SBATCH --partition=standard-g
 #SBATCH --gpus-per-node=1
 #SBATCH --time=00:30:00
-#SBATCH --job-name=infer-ocean
+#SBATCH --job-name=NC1Dto2D
 #SBATCH --exclusive
 
 CONFIG_NAME=$(pwd -P)/main-anemoi-infer.yaml
