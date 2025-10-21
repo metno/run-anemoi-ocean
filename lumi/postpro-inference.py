@@ -5,44 +5,43 @@ import sys
 import os
 import re
 
-def GetFilenameFromYaml(yml, extract_lam=False):
+def GetFilenamesFromYaml(yml, extract_lam=False):
     '''
-        Function for retrieving the output netCDF file from inference yaml. 
-    Args:
-        yml             [str]   :   Yaml file used for the inference
-        exctract_lam    [bool]  :   Set to True if lam region is extracted in yaml file.    
-    Returns:
-        The inference filename from yaml file.
-    '''
-
-    with open(yml, 'r') as file:
-        data = yaml.safe_load(file)
-
-        if extract_lam is False:
-            return data['output']['netcdf']
-        elif extract_lam is True:
-            return data['output']['extract_lam']['netcdf']['path']
-
-def OutputNameFromCheckpoint(yml):
-    '''
-        Function to set output netCDF filename based on checkpoint naming. 
+        Function for obtaining various information from inference yaml file. 
+        Finds path and filename of original netCDF inference file. 
+        Creates a new filename for netCDF file from information in yaml file, following this convention:
         YYYY-MM-DD-<last 5 run ID symbols>-e<epoch number>-s<step number>.nc
     Args:
         yml             [str]   :   Yaml file used for the inference
-        exctract_lam    [bool]  :   Set to True if lam region is extracted in yaml file. 
+        exctract_lam    [bool]  :   Set to True if lam region is extracted in yaml file.
     Returns:
-        output          [str]   :   A string representing the new filename following our naming convention.
-    '''
+        info_dict       [dict]  :   A dictionary containing the original netCDF filename, it's path and new filename based on conventions. 
 
+    '''
     with open(yml, 'r') as file:
+        
+        data = yaml.safe_load(file)
+
+        if extract_lam is False:
+            orig_file = data['output']['netcdf']
+        elif extract_lam is True:
+            orig_file = data['output']['extract_lam']['netcdf']['path']
+
         data = yaml.safe_load(file)
         run_id = re.findall(r'(?<=checkpoint\/).*(?=\/)', data['checkpoint'])[0][-5:]
         epoch = re.findall(r'(?<=epoch\_).*(?=\-)', data['checkpoint'])[0]
         step = re.findall(r'(?<=step\_).*(?=\.)', data['checkpoint'])[0]
 
-        output = str(data['date'])+'_'+run_id+'_e'+epoch+'_s'+step+'.nc'
+        orig_file_path = re.findall(r'.*(?<=\/)', orig_file)
+        convention_filename = str(data['date'])+'_'+run_id+'_e'+epoch+'_s'+step+'.nc'
 
-    return output
+        info_dict = {
+            'orig_file':orig_file,
+            'orig_file_path':orig_file_path,
+            'convention_filename':convention_filename
+        }
+        
+    return info_dict
 
 def InferenceTo2D(file, output=None, var_list=None, clean1D=True, grid_file = '/pfs/lustrep3/scratch/project_465002266/datasets/norkyst_grd_v31.nc'):
     '''
@@ -101,5 +100,6 @@ def InferenceTo2D(file, output=None, var_list=None, clean1D=True, grid_file = '/
 
 if __name__ == '__main__':
     print('Now reshaping inference file.')
-    InferenceTo2D(GetFilenameFromYaml(sys.argv[1]),OutputNameFromCheckpoint(sys.argv[1]))
+    info_dict = GetFilenamesFromYaml(sys.argv[1])
+    InferenceTo2D(info_dict['orig_filename'], info_dict['orig_file_path']+'/'+info_dict['convention_filename'])
 
