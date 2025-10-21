@@ -12,5 +12,5 @@ submit_job() {
 
 id1=$(submit_job infer_jobscript.sh)
 
-id2=$(submit_job --dependency=afterany:$id1 reshape_jobscript.sh)
+id2=$(submit_job --dependency=afterany:$id1 postpro-inference_jobscript.sh)
 
