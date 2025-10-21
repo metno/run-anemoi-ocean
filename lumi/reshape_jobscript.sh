@@ -4,7 +4,7 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --account=project_465002266
-#SBATCH --partition=standard-g
+#SBATCH --partition=dev-g
 #SBATCH --gpus-per-node=1
 #SBATCH --time=00:30:00
 #SBATCH --job-name=NC1Dto2D
@@ -44,4 +44,4 @@ srun --cpu-bind=$CPU_BIND \
                      -B /pfs:/pfs \
                      -B /var/spool/slurmd \
                      -B /opt/cray \
-        $CONTAINER python $(pwd -P)/2d-reshape.py ${CONFIG_NAME}
+        $CONTAINER python $(pwd -P)/postpro-inference.py ${CONFIG_NAME}
