@@ -4,10 +4,10 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --account=project_465002266
-#SBATCH --partition=dev-g
+#SBATCH --partition=standard-g
 #SBATCH --gpus-per-node=1
 #SBATCH --time=00:30:00
-#SBATCH --job-name=NC1Dto2D
+#SBATCH --job-name=PostproInf
 #SBATCH --exclusive
 
 CONFIG_NAME=$(pwd -P)/main-anemoi-infer.yaml
