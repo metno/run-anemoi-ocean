@@ -4,7 +4,7 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=8
 #SBATCH --account=project_465002266
-#SBATCH --partition=dev-g
+#SBATCH --partition=standard-g
 #SBATCH --gpus-per-node=8
 #SBATCH --time=00:30:00
 #SBATCH --job-name=infer-ocean
