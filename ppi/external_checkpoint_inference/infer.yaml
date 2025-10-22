@@ -1,4 +1,4 @@
-checkpoint: inference-anemoi-by_epoch-epoch_000-step_001892.ckpt 
+checkpoint: <checkpoint>
 
 date: 2024-04-02 
 
@@ -26,7 +26,7 @@ input:
     adjust: ["start", "end"]
 
 output:
-  netcdf: /lustre/storeB/project/fou/hi/foccus/ppi-experiments/inference-test/run-anemoi-ocean/ppi/lam-48h.nc
+  netcdf: /lustre/storeB/project/fou/hi/foccus/ppi-experiments/inference-test/run-anemoi-ocean/ppi/test.nc
 
 # Or get only output on the lam area
 #output:
