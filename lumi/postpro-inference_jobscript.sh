@@ -2,12 +2,12 @@
 #SBATCH --output=outputs/%x_%j.out
 #SBATCH --error=outputs/%x_%j.err
 #SBATCH --nodes=1
-#SBATCH --ntasks-per-node=8
+#SBATCH --ntasks-per-node=1
 #SBATCH --account=project_465002266
 #SBATCH --partition=dev-g
-#SBATCH --gpus-per-node=8
+#SBATCH --gpus-per-node=1
 #SBATCH --time=00:30:00
-#SBATCH --job-name=infer-ocean
+#SBATCH --job-name=PostproInf
 #SBATCH --exclusive
 
 CONFIG_NAME=$(pwd -P)/main-anemoi-infer.yaml
@@ -30,7 +30,7 @@ module load LUMI/24.03 #partition/G
 # see https://docs.lumi-supercomputer.eu/runjobs/scheduled-jobs/lumig-job/
 
 # New bindings see docs above. Correct ordering of cpu affinity
-# excludes first and last core since they are not available 
+# excludes first and last cbashre since they are not available 
 # on GPU-nodes
 CPU_BIND="mask_cpu:7e000000000000,7e00000000000000"
 CPU_BIND="${CPU_BIND},7e0000,7e000000"
@@ -44,4 +44,4 @@ srun --cpu-bind=$CPU_BIND \
                      -B /pfs:/pfs \
                      -B /var/spool/slurmd \
                      -B /opt/cray \
-        $CONTAINER $CONTAINER_SCRIPT $CONFIG_NAME
+        $CONTAINER python $(pwd -P)/postpro-inference.py ${CONFIG_NAME}

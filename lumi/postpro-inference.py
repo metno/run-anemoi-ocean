@@ -27,12 +27,11 @@ def GetFilenamesFromYaml(yml, extract_lam=False):
         elif extract_lam is True:
             orig_file = data['output']['extract_lam']['netcdf']['path']
 
-        data = yaml.safe_load(file)
         run_id = re.findall(r'(?<=checkpoint\/).*(?=\/)', data['checkpoint'])[0][-5:]
         epoch = re.findall(r'(?<=epoch\_).*(?=\-)', data['checkpoint'])[0]
         step = re.findall(r'(?<=step\_).*(?=\.)', data['checkpoint'])[0]
 
-        orig_file_path = re.findall(r'.*(?<=\/)', orig_file)
+        orig_file_path = re.findall(r'.*(?<=\/)', orig_file)[0]
         convention_filename = str(data['date'])+'_'+run_id+'_e'+epoch+'_s'+step+'.nc'
 
         info_dict = {
@@ -101,5 +100,5 @@ def InferenceTo2D(file, output=None, var_list=None, clean1D=True, grid_file = '/
 if __name__ == '__main__':
     print('Now reshaping inference file.')
     info_dict = GetFilenamesFromYaml(sys.argv[1])
-    InferenceTo2D(info_dict['orig_filename'], info_dict['orig_file_path']+'/'+info_dict['convention_filename'])
+    InferenceTo2D(info_dict['orig_file'], info_dict['orig_file_path']+'/'+str(info_dict['convention_filename']))
 
