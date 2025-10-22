@@ -21,7 +21,6 @@ def GetFilenamesFromYaml(yml, extract_lam=False):
     with open(yml, 'r') as file:
         
         data = yaml.safe_load(file)
-        print(data)
 
         if extract_lam is False:
             orig_file = data['output']['netcdf']
