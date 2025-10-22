@@ -26,7 +26,7 @@ input:
     adjust: ["start", "end"]
 
 output:
-  netcdf: /lustre/storeB/project/fou/hi/foccus/ppi-experiments/inference-test/run-anemoi-ocean/ppi/test.nc
+  netcdf: <output>
 
 # Or get only output on the lam area
 #output:
