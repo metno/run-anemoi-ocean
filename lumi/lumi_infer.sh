@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# Submit as 'bash lumi_infer.sh'
+
 submit_job() {
   sub="$(sbatch "$@")"
 
