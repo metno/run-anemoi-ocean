@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# Submit as 'bash lumi_infer.sh'
+
 submit_job() {
   sub="$(sbatch "$@")"
 
@@ -11,6 +13,7 @@ submit_job() {
 }
 
 id1=$(submit_job infer_jobscript.sh)
+echo "inference job ID: ${id1}"
 
-id2=$(submit_job --dependency=afterany:$id1 reshape_jobscript.sh)
-
+id2=$(submit_job --dependency=afterany:$id1 postpro-inference_jobscript.sh)
+echo "postpro job ID: ${id2}"

@@ -7,7 +7,7 @@
 #SBATCH --partition=standard-g
 #SBATCH --gpus-per-node=1
 #SBATCH --time=00:30:00
-#SBATCH --job-name=NC1Dto2D
+#SBATCH --job-name=PostproInf
 #SBATCH --exclusive
 
 CONFIG_NAME=$(pwd -P)/main-anemoi-infer.yaml
@@ -25,7 +25,7 @@ CONTAINER=$PROJECT_DIR/container/pytorch-2.7.0-rocm-6.2.4-py-3.12.9-v2.0.sif
 VENV=$(pwd -P)/.venv
 export VIRTUAL_ENV=$VENV
 
-module load LUMI/25.03 #partition/G
+module load LUMI/24.03 #partition/G
 # see https://docs.lumi-supercomputer.eu/hardware/lumig/
 # see https://docs.lumi-supercomputer.eu/runjobs/scheduled-jobs/lumig-job/
 
@@ -44,4 +44,4 @@ srun --cpu-bind=$CPU_BIND \
                      -B /pfs:/pfs \
                      -B /var/spool/slurmd \
                      -B /opt/cray \
-        $CONTAINER python $(pwd -P)/2d-reshape.py ${CONFIG_NAME}
+        $CONTAINER python $(pwd -P)/postpro-inference.py ${CONFIG_NAME}
