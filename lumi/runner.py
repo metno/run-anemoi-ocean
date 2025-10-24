@@ -599,7 +599,7 @@ class Runner(Context):
 
             # Predict next state of atmosphere
             with (
-                torch.autocast(device_type="cuda", dtype=self.autocast),
+                torch.autocast(device_type=self.device, dtype=self.autocast),
                 ProfilingLabel("Predict step", self.use_profiler),
                 Timer(title),
             ):
