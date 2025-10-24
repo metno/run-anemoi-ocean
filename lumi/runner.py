@@ -599,7 +599,7 @@ class Runner(Context):
 
             # Predict next state of atmosphere
             with (
-                torch.autocast(device_type="cuda", dtype=self.autocast),
+                torch.autocast(device_type=self.device, dtype=self.autocast),
                 ProfilingLabel("Predict step", self.use_profiler),
                 Timer(title),
             ):
@@ -611,8 +611,13 @@ class Runner(Context):
 
             # Update state
             with ProfilingLabel("Updating state (CPU)", self.use_profiler):
-                for i in range(output.shape[1]):
-                    new_state["fields"][self.checkpoint.output_tensor_index_to_variable[i]] = output[:, i]
+                try:
+                    for i in range(output.shape[1]):
+                        new_state["fields"][self.checkpoint.output_tensor_index_to_variable[i]] = output[:, i]
+                except:
+                    output = np.reshape(output, (len(output), 1))
+                    for i in range(output.shape[1]):
+                        new_state["fields"][self.checkpoint.output_tensor_index_to_variable[i]] = output[:, i]
 
             if (s == 0 and self.verbosity > 0) or self.verbosity > 1:
                 self._print_output_tensor("Output tensor", output)
