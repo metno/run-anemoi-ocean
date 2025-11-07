@@ -15,6 +15,7 @@ echo ""
 SIF=/cluster/projects/nn12017k/container/pytorch_25.08-py3.sif
 SQSH=./anemoi-env.sqsh
 export APPTAINERENV_PREPEND_PATH=/user-software/bin
+CONFIG_NAME=$PWD/main-core.yaml
 
 apptainer exec --nv -B $PWD -B ${SQSH}:/user-software:image-src=/ ${SIF} \
     bash -c "source /user-software/bin/activate && anemoi-training train --config-name=$CONFIG_NAME"
