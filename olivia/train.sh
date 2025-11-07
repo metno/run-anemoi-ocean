@@ -1,24 +1,22 @@
 #!/bin/bash
-#SBATCH --job-name=test-train
 #SBATCH --account=nn12017k
-#SBATCH --time=00:10:00
-#SBATCH --output=outputs/train-%j.out
-#SBATCH --error=outputs/train-%j.err
+#SBATCH --job-name=train_4gpu
 #SBATCH --partition=accel
-#SBATCH --nodes=1                     # Single compute node
-#SBATCH --ntasks-per-node=1          # One task (process) on the node
-#SBATCH --cpus-per-task=72           # Reserve 72 CPU cores
-#SBATCH --mem-per-gpu=110G           # Request 110 GB of CPU RAM per GPU
-#SBATCH --gpus-per-node=1            # Request 1 GPU
+#SBATCH --nodes=1
+#SBATCH --gpus=4
+#SBATCH --cpus-per-task=72
+#SBATCH --mem=0
+#SBATCH --time=00:10:00
+#SBATCH --output=outputs/train_4gpu_%j.out
 
-CONTAINER="/cluster/work/support/container/pytorch_nvidia_25.06_arm64.sif"
-BIND="/cluster/projects/nn12017k/"
+echo "Multi-GPU Training Test (DDP with NCCL)"
+echo ""
 
-CONFIG_NAME=template_configs/main-core.yaml
-CONTAINER_SCRIPT=$(pwd -P)/run_pytorch.sh
-echo $CONTAINER_SCRIPT
-VENV=$(pwd -P)/.venv
-export VIRTUAL_ENV=$VENV
+SIF=/cluster/projects/nn12017k/container/pytorch_25.08-py3.sif
+SQSH=./anemoi-env.sqsh
+export APPTAINERENV_PREPEND_PATH=/user-software/bin
 
-# Clone and pip install anemoi repos from the container
-apptainer exec -B $BIND $CONTAINER $CONTAINER_SCRIPT
+apptainer exec --nv -B $PWD -B ${SQSH}:/user-software:image-src=/ ${SIF} \
+    bash -c "source /user-software/bin/activate && anemoi-training train --config-name=$CONFIG_NAME"
+
+# bash -c "source /user-software/bin/activate && torchrun --standalone --nproc_per_node=4 train_multi_gpu.py"
