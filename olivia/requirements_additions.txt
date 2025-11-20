@@ -1,4 +1,5 @@
-anemoi-training
+anemoi-training==0.6.7
 anemoi-models
 anemoi-graphs
 anemoi-datasets
+trimesh
