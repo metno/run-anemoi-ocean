@@ -5,9 +5,9 @@
 #SBATCH --nodes=1
 #SBATCH --gpus=1
 #SBATCH --cpus-per-task=72
-#SBATCH --mem=0
-#SBATCH --time=00:10:00
-#SBATCH --output=outputs/train_%j.out
+#SBATCH --mem-per-cpu=2G
+#SBATCH --time=7-00:00:00
+#SBATCH --output=outputs/train_4_%j.out
 
 echo "Multi-GPU Training Test (DDP with NCCL)"
 echo ""
