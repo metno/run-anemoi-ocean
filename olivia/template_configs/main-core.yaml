@@ -106,16 +106,8 @@ dataloader:
     join:
       - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_main}
         frequency: ${data.frequency}
-      - concat: # this part will be replaced once the full combined forcing file is done rsyncing
-        - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_force12-16}
-          frequency: ${data.frequency}
-          start: 2012
-          end: 2016
-        - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_force17-24}
-          frequency: ${data.frequency}
-          start: 2017
-          end: 2024
-          drop: ["cloud"]
+      - dataset: ${hardware.paths.data}/${hardware.files.dataset.dataset_force}
+        frequency: ${data.frequency}
     adjust: ["start", "end"]
   grid_indices:
     _target_: anemoi.training.data.grid_indices.MaskedGrid
@@ -151,7 +143,7 @@ diagnostics:
       authentication: True
       tracking_uri: https://mlflow.ecmwf.int
       experiment_name: 'metno-fou'
-      run_name: 'replace-me' #change this
+      run_name: '<replace-me>' #change this
     wandb: 
       entity: null
   print_memory_summary: True
@@ -170,14 +162,13 @@ diagnostics:
 
 hardware:
   paths:
-    data: /cluster/projects/nn12017k/datasets/
-    output: /cluster/projects/nn12017k/experiments/replace-me/
+    data: /cluster/work/projects/nn12017k/datasets2/
+    output: /cluster/projects/nn12017k/experiments/<replace-me>/
     graph: /cluster/projects/nn12017k/graphs/
   files:
     dataset:
       dataset_main: norkystv3_hindcast_2012-2024.zarr
-      dataset_force12-16: norkystv3_forcing_zarr/forcing_norkystv3_hindcast_2012-2016.zarr  # Enable this for longer training. Then exclude cloud.
-      dataset_force17-24: norkystv3_forcing_zarr/forcing_norkystv3_hindcast_2017-2024.zarr
+      dataset_force: forcing_norkystv3_hindcast_2012-2024.zarr  # Enable this for longer training. Then exclude cloud.
     graph: LAM-trimedge-10-res-12-scale12.pt 
     warm_start: null #specific checkpoint to start from, defaults to last.ckpt
 
@@ -240,7 +231,7 @@ training:
   load_weights_only: False #loads entire model if False, loads only weights if True
   
   max_epochs: null
-  max_steps: 20000
+  max_steps: 50000
   lr:
     warmup: 1000 # number of warmup iterations
     rate: 6.25e-5 #local_lr
