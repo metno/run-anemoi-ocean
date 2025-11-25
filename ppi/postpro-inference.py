@@ -27,7 +27,7 @@ def GetFilenamesFromYaml(yml, extract_lam=False):
         elif extract_lam is True:
             orig_file = data['output']['extract_lam']['netcdf']['path']
 
-        run_id = re.findall(r'(?<=\/)(?!.*\/).*(?<=\.ckpt)', data['checkpoint'])[0][-5:]
+        run_id = re.findall(r'(?<=checkpoint\/).*(?=\/)', data['checkpoint'])[0][-5:]
         epoch = re.findall(r'(?<=epoch\_).*(?=\-)', data['checkpoint'])[0]
         step = re.findall(r'(?<=step\_).*(?=\.)', data['checkpoint'])[0]
 
