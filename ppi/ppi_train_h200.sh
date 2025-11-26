@@ -4,7 +4,7 @@
 #SBATCH --gres=gpu:nvidia_h200_nvl:1
 #SBATCH --partition=gpuB-prod
 #SBATCH --time=24:00:00
-#SBATCH --account=hi-training
+#SBATCH --account=havbris
 #SBATCH --mem=16G
 #SBATCH --ntasks-per-node=1
 
