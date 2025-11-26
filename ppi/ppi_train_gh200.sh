@@ -4,7 +4,7 @@
 #SBATCH --gres=gpu:nvidia_gh200_480gb:1 
 #SBATCH --partition=gpuB-arm-research
 #SBATCH --time=24:00:00
-#SBATCH --account=hi-training
+#SBATCH --account=havbris
 #SBATCH --mem=400g
 ##SBATCH --mail-type=ALL
 ##SBATCH --mail-user=mateuszm@met.no

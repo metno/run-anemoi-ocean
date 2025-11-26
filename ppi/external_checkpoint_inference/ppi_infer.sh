@@ -2,9 +2,9 @@
 #SBATCH --job-name="Infer"
 #SBATCH --output=output/Infer_%j.log
 #SBATCH --gres=gpu:nvidia_h200_nvl:1
-#SBATCH --partition=gpuB-prod
+#SBATCH --partition=gpuB-research
 #SBATCH --time=00:30:00
-#SBATCH --account=hi-training
+#SBATCH --account=havbris
 #SBATCH --mem=80G
 #SBATCH --ntasks-per-node=1
 
