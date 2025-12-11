@@ -13,16 +13,8 @@ input:
     join:
       - dataset: /lustre/storeB/project/fou/hi/foccus/datasets/norkystv3_hindcast_2012-2024.zarr
         frequency: 3h
-      - concat:
-        - dataset: /lustre/storeB/project/fou/hi/foccus/datasets/forcing_norkystv3_hindcast_zarr/forcing_norkystv3_hindcast_2012-2016.zarr
-          frequency: 3h
-          start: 2012
-          end: 2016
-        - dataset: /lustre/storeB/project/fou/hi/foccus/datasets/forcing_norkystv3_hindcast_zarr/forcing_norkystv3_hindcast_2017-2024.zarr
-          frequency: 3h
-          start: 2017
-          end: 2024
-          drop: ["cloud"]
+      - dataset: /lustre/storeB/project/fou/hi/foccus/datasets/forcing_norkystv3_hindcast_zarr/forcing_norkystv3_hindcast_2012-2024.zarr
+        frequency: 3h
     adjust: ["start", "end"]
 
 output:
